@@ -222,8 +222,14 @@ func FuzzJSONUnmarshal_NoPanic(f *testing.F) {
 			f.Add(fmt.Sprintf(`{"amount": %s, "currency": %s}`, c, a))
 			f.Add(fmt.Sprintf(`"amount": %s, "currency": %s}`, a, c))
 			f.Add(fmt.Sprintf(`{"amount": %s, "currency": %s`, c, a))
+			f.Add(fmt.Sprintf(`{"amount": %s,,""""currency": %s}`, a, c))
 		}
 	}
+
+	f.Add(`{"amount": 123.32, "currency":""}`)
+	f.Add(`{"amount": , "currency":""}`)
+	f.Add(`{"amount":,"currency":""}`)
+
 	f.Fuzz(func(t *testing.T, s string) {
 		var x fpmoney.Amount
 		err := json.Unmarshal([]byte(s), &x)

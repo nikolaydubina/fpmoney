@@ -1,7 +1,6 @@
 package fpmoney
 
 import (
-	"errors"
 	"strings"
 
 	"github.com/ferdypruis/iso4217"
@@ -108,46 +107,31 @@ const (
 // - check that pointer method receiver is not nil;
 // - removes whitespace in b []bytes
 func (a *Amount) UnmarshalJSON(b []byte) (err error) {
-	var as, ae int
+	var as, ae, e int
 
 	for i := 0; i < len(b); i++ {
 		// currency
-		if b[i] == 'c' {
-			if (i + len(keyCurrency)) > len(b) {
-				return ErrUnmarshalJSONWrongCurrency
-			}
-			if string(b[i:i+len(keyCurrency)]) != keyCurrency {
-				return ErrUnmarshalJSONWrongCurrency
-			}
+		if b[i] == 'c' && (i+len(keyCurrency)) <= len(b) && string(b[i:i+len(keyCurrency)]) == keyCurrency {
 			i += len(keyCurrency) + 2 // `":`
 
-			// currency is always string of 3 symbols. find opening quote.
+			// find opening quote.
 			for ; i < len(b) && b[i] != '"'; i++ {
 			}
 			if i == len(b) {
-				return ErrUnmarshalJSONWrongCurrency
+				return NewErrUnmarshalJSONWrongCurrency("missing json value")
 			}
 			i++ // opening `"`
-			e := i + lenISO427Currency
+			e = i + lenISO427Currency
 			if e > len(b) {
-				return ErrUnmarshalJSONWrongCurrency
+				return NewErrUnmarshalJSONWrongCurrency(string(b[i:]))
 			}
 
 			a.c = currency.CastCurrency(b[i:e])
-			if a.c == iso4217.Currency(0) {
-				return ErrUnmarshalJSONWrongCurrency
-			}
-			i = e + 1
+			i = e
 		}
 
 		// amount
-		if b[i] == 'a' {
-			if (i + len(keyCurrency)) > len(b) {
-				return ErrUnmarshalJSONWrongCurrency
-			}
-			if string(b[i:i+len(keyAmount)]) != keyAmount {
-				return ErrUnmarshalJSONWrongAmount
-			}
+		if b[i] == 'a' && (i+len(keyCurrency)) <= len(b) && string(b[i:i+len(keyAmount)]) == keyAmount {
 			i += len(keyAmount) + 2 // `":`
 			// go until find either number or + or -, which is a start of simple number.
 			for ; i < len(b) && (b[i] < '0' || b[i] > '9') && b[i] != '-' && b[i] != '+'; i++ {
@@ -156,8 +140,12 @@ func (a *Amount) UnmarshalJSON(b []byte) (err error) {
 			// find end of number
 			for ae = i; ae < len(b) && ((b[ae] >= '0' && b[ae] <= '9') || b[ae] == '-' || b[ae] == '+' || b[ae] == '.'); ae++ {
 			}
-			i = ae + 1
+			i = ae
 		}
+	}
+
+	if a.c == iso4217.Currency(0) {
+		return NewErrUnmarshalJSONWrongCurrency("not recognized")
 	}
 
 	a.v, err = fpdecimal.ParseFixedPointDecimal(string(b[as:ae]), int8(a.c.Exponent()))
@@ -197,11 +185,20 @@ func (e *ErrCurrencyMismatch) Error() string {
 	return e.a.Alpha() + " != " + e.b.Alpha()
 }
 
-var (
-	ErrUnmarshalJSONWrongCurrency = errors.New("unmarshal json wrong currency")
-	ErrUnmarshalJSONWrongAmount   = errors.New("unmarshal json wrong amount")
-	ErrUnmarshalJSONMissingFields = errors.New("unmarshal json missing fields")
-)
+type ErrUnmarshalJSONWrongCurrency struct {
+	s string
+}
+
+func NewErrUnmarshalJSONWrongCurrency(s string) *ErrUnmarshalJSONWrongCurrency {
+	return &ErrUnmarshalJSONWrongCurrency{s: s}
+}
+
+func (e *ErrUnmarshalJSONWrongCurrency) Error() string {
+	if e == nil {
+		return ""
+	}
+	return "wrong currency: " + e.s
+}
 
 func scale(currency iso4217.Currency) int64 {
 	switch currency.Exponent() {
