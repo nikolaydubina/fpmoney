@@ -11,6 +11,7 @@
 * does not leak precision
 * Fuzz tests
 * parsing is faster than `int`, `float`, `string`
+* 200 LOC
 
 ```go
 var BuySP500Price = fpmoney.FromInt(9000, iso4217.SGD)
