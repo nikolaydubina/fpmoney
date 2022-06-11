@@ -51,7 +51,7 @@ fmt.Println(a, r)
 // Output: 0.20 SGD 0 SGD
 ```
 
-## Cross Currency Protection
+### Cross Currency Protection
 
 Akin to integer division by 0, which panics in Go, arithmetic operations on differnet currenices result in panic.
 Returning error in arithmetic operation would prohibit chaning of method calls, which is not convenient.
