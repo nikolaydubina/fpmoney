@@ -167,10 +167,10 @@ func (a *Amount) UnmarshalJSON(b []byte) (err error) {
 
 func (a Amount) MarshalJSON() ([]byte, error) {
 	var b strings.Builder
-	b.Grow(256)
+	b.Grow(50)
 	b.WriteRune('{')
 	b.WriteString(`"amount":`)
-	b.WriteString(fpdecimal.FixedPointDecimalToString(int64(a.v), a.c.Exponent()))
+	b.WriteString(fpdecimal.FixedPointDecimalToString(a.v, a.c.Exponent()))
 	b.WriteString(`,`)
 	b.WriteString(`"currency":`)
 	b.WriteRune('"')

@@ -62,7 +62,7 @@ func FuzzArithmetics(f *testing.F) {
 		f.Add(tc[0], tc[1], uint16(iso4217.CLF))
 	}
 	f.Fuzz(func(t *testing.T, a, b int64, c uint16) {
-		if c > 300 {
+		if c > 300 || c == 0 {
 			t.Skip()
 		}
 		currency := iso4217.Currency(c)
@@ -431,7 +431,7 @@ func FuzzJSON_MarshalUnmarshal(f *testing.F) {
 		f.Add(-tc, uint16(iso4217.CLF))
 	}
 	f.Fuzz(func(t *testing.T, v int64, c uint16) {
-		if c > 300 {
+		if c > 300 || c == 0 {
 			t.Skip()
 		}
 
@@ -444,7 +444,7 @@ func FuzzJSON_MarshalUnmarshal(f *testing.F) {
 
 		var x fpmoney.Amount
 		if err := json.Unmarshal(s, &x); err != nil {
-			t.Error(err, s)
+			t.Error(err, string(s))
 		}
 
 		if x != q {
@@ -519,6 +519,69 @@ func BenchmarkJSONUnmarshal(b *testing.B) {
 	}
 }
 
+var testsInts = []struct {
+	name string
+	vals []string
+}{
+	{
+		name: "small",
+		vals: []string{
+			`{"currency": "KRW", "amount": 123456}`,
+			`{"currency": "KRW", "amount": 123}`,
+			`{"currency": "KRW", "amount": 12}`,
+			`{"currency": "KRW", "amount": 1}`,
+			`{"currency": "KRW", "amount": 982}`,
+			`{"currency": "KRW", "amount": 101}`,
+			`{"currency": "KRW", "amount": 10}`,
+			`{"currency": "KRW", "amount": 11}`,
+			`{"currency": "KRW", "amount": 1}`,
+		},
+	},
+	{
+		name: "large",
+		vals: []string{
+			`{"currency": "KRW", "amount": 123123123112312}`,
+			`{"currency": "KRW", "amount": 5341320482340234}`,
+		},
+	},
+}
+
+func BenchmarkJSONUnmarshal_int(b *testing.B) {
+	type T struct {
+		Amount   int    `json:"amount"`
+		Currency string `json:"currency"`
+	}
+	var s T
+	for _, tc := range testsInts {
+		b.Run(tc.name, func(b *testing.B) {
+			for n := 0; n < b.N; n++ {
+				err := json.Unmarshal([]byte(tc.vals[n%len(tc.vals)]), &s)
+				if err != nil || (s == T{}) {
+					b.Error(s, err)
+				}
+			}
+		})
+	}
+}
+
+func BenchmarkJSONUnmarshal_float32(b *testing.B) {
+	type T struct {
+		Amount   float32 `json:"amount"`
+		Currency string  `json:"currency"`
+	}
+	var s T
+	for _, tc := range testsFloats {
+		b.Run(tc.name, func(b *testing.B) {
+			for n := 0; n < b.N; n++ {
+				err := json.Unmarshal([]byte(tc.vals[n%len(tc.vals)]), &s)
+				if err != nil || (s == T{}) {
+					b.Error(s, err)
+				}
+			}
+		})
+	}
+}
+
 func BenchmarkJSONMarshal(b *testing.B) {
 	var s []byte
 	var err error
@@ -548,18 +611,32 @@ func BenchmarkJSONMarshal(b *testing.B) {
 	}
 }
 
-func BenchmarkJSONUnmarshal_float32(b *testing.B) {
+func BenchmarkJSONMarshal_int(b *testing.B) {
 	type T struct {
-		Amount   float32 `json:"amount"`
-		Currency string  `json:"currency"`
+		Amount   int    `json:"amount"`
+		Currency string `json:"currency"`
 	}
-	var s T
-	for _, tc := range testsFloats {
+	var s []byte
+	var err error
+	for _, tc := range testsInts {
+		tests := make([]T, 0, len(tc.vals))
+		for _, q := range tc.vals {
+			var x T
+			if err := json.Unmarshal([]byte(q), &x); err != nil {
+				b.Error(err)
+			}
+			tests = append(tests, x)
+		}
+
+		b.ResetTimer()
 		b.Run(tc.name, func(b *testing.B) {
 			for n := 0; n < b.N; n++ {
-				err := json.Unmarshal([]byte(tc.vals[n%len(tc.vals)]), &s)
-				if err != nil || (s == T{}) {
-					b.Error(s, err)
+				s, err = json.Marshal(tests[n%len(tc.vals)])
+				if err != nil {
+					b.Error(err)
+				}
+				if string(s) == "" {
+					b.Error("empty str")
 				}
 			}
 		})
@@ -597,52 +674,6 @@ func BenchmarkJSONMarshal_float32(b *testing.B) {
 		})
 	}
 }
-
-var testsInts = []struct {
-	name string
-	vals []string
-}{
-	{
-		name: "small",
-		vals: []string{
-			`{"currency": "KRW", "amount": 123456}`,
-			`{"currency": "KRW", "amount": 123}`,
-			`{"currency": "KRW", "amount": 12}`,
-			`{"currency": "KRW", "amount": 1}`,
-			`{"currency": "KRW", "amount": 982}`,
-			`{"currency": "KRW", "amount": 101}`,
-			`{"currency": "KRW", "amount": 10}`,
-			`{"currency": "KRW", "amount": 11}`,
-			`{"currency": "KRW", "amount": 1}`,
-		},
-	},
-	{
-		name: "large",
-		vals: []string{
-			`{"currency": "KRW", "amount": 123123123112312}`,
-			`{"currency": "KRW", "amount": 5341320482340234}`,
-		},
-	},
-}
-
-func BenchmarkJSONUnmarshal_ints(b *testing.B) {
-	type T struct {
-		Amount   int    `json:"amount"`
-		Currency string `json:"currency"`
-	}
-	var s T
-	for _, tc := range testsInts {
-		b.Run(tc.name, func(b *testing.B) {
-			for n := 0; n < b.N; n++ {
-				err := json.Unmarshal([]byte(tc.vals[n%len(tc.vals)]), &s)
-				if err != nil || (s == T{}) {
-					b.Error(s, err)
-				}
-			}
-		})
-	}
-}
-
 
 func TestMemoryLayout(t *testing.T) {
 	a := fpmoney.FromFloat(-1000.123, iso4217.SGD)

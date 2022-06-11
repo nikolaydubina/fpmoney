@@ -53,22 +53,24 @@ fmt.Println(a, r)
 ### Benchmarks
 
 ```
-$ go test -bench=. -benchtime=5s -benchmem ./...
+$ go test -bench=. -benchmem ./...
 goos: darwin
 goarch: arm64
 pkg: github.com/nikolaydubina/fpmoney
-BenchmarkArithmetic/add_x1-10                     1000000000             0.5554 ns/op        0 B/op           0 allocs/op
-BenchmarkArithmetic/add_x100-10                     91634821            65.44 ns/op          0 B/op           0 allocs/op
-BenchmarkJSONUnmarshal/small-10                     17434430           344.8 ns/op         198 B/op           3 allocs/op
-BenchmarkJSONUnmarshal/large-10                     13737987           429.4 ns/op         216 B/op           3 allocs/op
-BenchmarkJSONUnmarshal_ints/small-10                12467486           480.0 ns/op         269 B/op           6 allocs/op
-BenchmarkJSONUnmarshal_ints/large-10                11437676           525.5 ns/op         288 B/op           7 allocs/op
-BenchmarkJSONUnmarshal_float32/small-10             11808940           507.3 ns/op         271 B/op           6 allocs/op
-BenchmarkJSONUnmarshal_float32/large-10             10445893           571.0 ns/op         312 B/op           7 allocs/op
-BenchmarkJSONMarshal/small-10                       19070586           302.0 ns/op         337 B/op           4 allocs/op
-BenchmarkJSONMarshal/large-10                       16315438           366.9 ns/op         384 B/op           5 allocs/op
-BenchmarkJSONMarshal_float32/small-10               31170051           192.0 ns/op          66 B/op           2 allocs/op
-BenchmarkJSONMarshal_float32/large-10               32962232           176.7 ns/op          72 B/op           2 allocs/op
+BenchmarkArithmetic/add_x1-10        	          1000000000	         0.5492 ns/op	   0 B/op	       0 allocs/op
+BenchmarkArithmetic/add_x100-10      	            18430124	        64.64 ns/op	       0 B/op	       0 allocs/op
+BenchmarkJSONUnmarshal/small-10      	             3531835	       340.7 ns/op	     198 B/op	       3 allocs/op
+BenchmarkJSONUnmarshal/large-10      	             2791712	       426.9 ns/op	     216 B/op	       3 allocs/op
+BenchmarkJSONUnmarshal_int/small-10  	             2504600	       478.5 ns/op	     269 B/op	       6 allocs/op
+BenchmarkJSONUnmarshal_int/large-10  	             2294034	       522.2 ns/op	     288 B/op	       7 allocs/op
+BenchmarkJSONUnmarshal_float32/small-10         	 2405636	       496.9 ns/op	     271 B/op	       6 allocs/op
+BenchmarkJSONUnmarshal_float32/large-10         	 2122207	       567.6 ns/op	     312 B/op	       7 allocs/op
+BenchmarkJSONMarshal/small-10                   	 4379685	       274.4 ns/op	     144 B/op	       4 allocs/op
+BenchmarkJSONMarshal/large-10                   	 3321205	       345.8 ns/op	     192 B/op	       5 allocs/op
+BenchmarkJSONMarshal_int/small-10               	 8629840	       138.6 ns/op	      57 B/op	       2 allocs/op
+BenchmarkJSONMarshal_int/large-10               	 8318066	       143.2 ns/op	      72 B/op	       2 allocs/op
+BenchmarkJSONMarshal_float32/small-10           	 6289126	       189.9 ns/op	      66 B/op	       2 allocs/op
+BenchmarkJSONMarshal_float32/large-10           	 6819679	       175.7 ns/op	      72 B/op	       2 allocs/op
 PASS
 ok      github.com/nikolaydubina/fpmoney    62.744s
 ```
