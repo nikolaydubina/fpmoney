@@ -66,3 +66,20 @@ BenchmarkJSONMarshal_float32/large-10           	33842808	       177.2 ns/op	   
 PASS
 ok  	github.com/nikolaydubina/fpmoney	62.744s
 ```
+
+## Appendix A: json.Unmarshal optimizations
+
+Parsing is surprisingly slow. It is ~6x of `float32` + `string`.
+
+Use `json.NewDecoder` and parse directly.
+```
+BenchmarkJSONUnmarshal/small-10      	 2030568	      2977 ns/op	    1599 B/op	      38 allocs/op
+BenchmarkJSONUnmarshal/large-10      	 1956444	      3106 ns/op	    1640 B/op	      39 allocs/op
+
+```
+
+Make container struct and wrap int and iso4217 currency and copy values.
+```
+BenchmarkJSONUnmarshal/small-10      	 2776969	      2160 ns/op	     430 B/op	       8 allocs/op
+BenchmarkJSONUnmarshal/large-10      	 2649692	      2263 ns/op	     448 B/op	       8 allocs/op
+```
