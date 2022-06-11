@@ -1,4 +1,4 @@
-# ✈️ Small Fixed-Point Decimal Money
+## ✈️ Small Fixed-Point Decimal Money
 
 * `ISO 4217`
 * as fast as `int64`
@@ -30,7 +30,7 @@ fmt.Println(amountToBuy)
 // Output: 18000.04 SGD
 ```
 
-## Division
+### Division
 
 Division always returns remainder.
 Fractional cents can never be reached.
@@ -46,7 +46,7 @@ fmt.Println(a, r)
 // Output: 0.20 SGD 0 SGD
 ```
 
-## Benchmarks
+### Benchmarks
 
 ```
 nikolaydubina@Nikolays-MacBook-Pro fpmoney % go test -bench=. -benchtime=5s -benchmem ./...
