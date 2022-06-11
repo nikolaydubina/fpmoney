@@ -1,4 +1,4 @@
-## ✈️ Fixed-Point Decimal Money
+## 🧧 Fixed-Point Decimal Money
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/nikolaydubina/fpmoney)](https://goreportcard.com/report/github.com/nikolaydubina/fpmoney)
 [![Go Reference](https://pkg.go.dev/badge/github.com/nikolaydubina/fpmoney.svg)](https://pkg.go.dev/github.com/nikolaydubina/fpmoney)
