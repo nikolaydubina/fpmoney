@@ -266,6 +266,10 @@ func TestUnmarshalJSON(t *testing.T) {
 	}{
 		// 2 cents
 		{
+			s: `{"currency": "SGD","amount": 9002.01}`,
+			v: fpmoney.FromIntScaled(900201, iso4217.SGD),
+		},
+		{
 			s: `{"amount": 9002.01, "currency": "SGD"}`,
 			v: fpmoney.FromIntScaled(900201, iso4217.SGD),
 		},
@@ -301,6 +305,21 @@ func TestUnmarshalJSON(t *testing.T) {
 		{
 			s: `{"amount":-123,"currency":"KRW"}`,
 			v: fpmoney.FromIntScaled(-123, iso4217.KRW),
+		},
+		// 2 cents strange valid input
+		{
+			s: `    {   "amount" : 9002.01
+			
+			, 
+			
+			"currency"
+			    : 
+			
+			"SGD"}   
+
+
+			 `,
+			v: fpmoney.FromIntScaled(900201, iso4217.SGD),
 		},
 	}
 	for _, tc := range tests {
@@ -578,6 +597,52 @@ func BenchmarkJSONMarshal_float32(b *testing.B) {
 		})
 	}
 }
+
+var testsInts = []struct {
+	name string
+	vals []string
+}{
+	{
+		name: "small",
+		vals: []string{
+			`{"currency": "KRW", "amount": 123456}`,
+			`{"currency": "KRW", "amount": 123}`,
+			`{"currency": "KRW", "amount": 12}`,
+			`{"currency": "KRW", "amount": 1}`,
+			`{"currency": "KRW", "amount": 982}`,
+			`{"currency": "KRW", "amount": 101}`,
+			`{"currency": "KRW", "amount": 10}`,
+			`{"currency": "KRW", "amount": 11}`,
+			`{"currency": "KRW", "amount": 1}`,
+		},
+	},
+	{
+		name: "large",
+		vals: []string{
+			`{"currency": "KRW", "amount": 123123123112312}`,
+			`{"currency": "KRW", "amount": 5341320482340234}`,
+		},
+	},
+}
+
+func BenchmarkJSONUnmarshal_ints(b *testing.B) {
+	type T struct {
+		Amount   int    `json:"amount"`
+		Currency string `json:"currency"`
+	}
+	var s T
+	for _, tc := range testsInts {
+		b.Run(tc.name, func(b *testing.B) {
+			for n := 0; n < b.N; n++ {
+				err := json.Unmarshal([]byte(tc.vals[n%len(tc.vals)]), &s)
+				if err != nil || (s == T{}) {
+					b.Error(s, err)
+				}
+			}
+		})
+	}
+}
+
 
 func TestMemoryLayout(t *testing.T) {
 	a := fpmoney.FromFloat(-1000.123, iso4217.SGD)

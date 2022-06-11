@@ -1,14 +1,12 @@
 package fpmoney
 
 import (
-	"bytes"
-	"encoding/json"
 	"errors"
-	"io"
 	"strings"
 
 	"github.com/ferdypruis/iso4217"
 	"github.com/nikolaydubina/fpdecimal"
+	"github.com/nikolaydubina/fpmoney/currency"
 	"golang.org/x/exp/constraints"
 )
 
@@ -95,57 +93,75 @@ func (a Amount) String() string {
 	return fpdecimal.FixedPointDecimalToString(int64(a.v), a.c.Exponent()) + " " + a.c.Alpha()
 }
 
+const (
+	keyCurrency = "currency"
+	keyAmount   = "amount"
+
+	lenISO427Currency = 3
+)
+
+// UnmarshalJSON parses string.
+// This is implemented directly for speed.
+// Avoiding json.Decoder, interface{}, reflect, tags, temporary structs.
+// Avoiding mallocs.
+// Go json package provides:
+// - check that pointer method receiver is not nil;
+// - removes whitespace in b []bytes
 func (a *Amount) UnmarshalJSON(b []byte) (err error) {
-	var rv string
+	var as, ae int
 
-	dec := json.NewDecoder(bytes.NewReader(b))
-	dec.UseNumber()
-
-	var isNextCurrency, isNextAmount bool
-	for {
-		t, err := dec.Token()
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			return err
-		}
-
-		if isNextCurrency || isNextAmount {
-			switch {
-			case isNextAmount:
-				t, ok := t.(json.Number)
-				if !ok {
-					return ErrUnmarshalJSONWrongAmount
-				}
-				rv = t.String()
-				isNextAmount = false
-			case isNextCurrency:
-				t, ok := t.(string)
-				if !ok {
-					return ErrUnmarshalJSONWrongCurrency
-				}
-				a.c, err = iso4217.FromAlpha(t)
-				if err != nil {
-					return err
-				}
-				isNextCurrency = false
+	for i := 0; i < len(b); i++ {
+		// currency
+		if b[i] == 'c' {
+			if (i + len(keyCurrency)) > len(b) {
+				return ErrUnmarshalJSONWrongCurrency
 			}
-			continue
+			if string(b[i:i+len(keyCurrency)]) != keyCurrency {
+				return ErrUnmarshalJSONWrongCurrency
+			}
+			i += len(keyCurrency) + 2 // `":`
+
+			// currency is always string of 3 symbols. find opening quote.
+			for ; i < len(b) && b[i] != '"'; i++ {
+			}
+			if i == len(b) {
+				return ErrUnmarshalJSONWrongCurrency
+			}
+			i++ // opening `"`
+			e := i + lenISO427Currency
+			if e > len(b) {
+				return ErrUnmarshalJSONWrongCurrency
+			}
+
+			a.c = currency.CastCurrency(b[i:e])
+			if a.c == iso4217.Currency(0) {
+				return ErrUnmarshalJSONWrongCurrency
+			}
+			i = e + 1
 		}
 
-		if t, ok := t.(string); ok {
-			switch t {
-			case `amount`:
-				isNextAmount = true
-			case `currency`:
-				isNextCurrency = true
+		// amount
+		if b[i] == 'a' {
+			if (i + len(keyCurrency)) > len(b) {
+				return ErrUnmarshalJSONWrongCurrency
 			}
-			continue
+			if string(b[i:i+len(keyAmount)]) != keyAmount {
+				return ErrUnmarshalJSONWrongAmount
+			}
+			i += len(keyAmount) + 2 // `":`
+			// go until find either number or + or -, which is a start of simple number.
+			for ; i < len(b) && (b[i] < '0' || b[i] > '9') && b[i] != '-' && b[i] != '+'; i++ {
+			}
+			as = i
+			// find end of number
+			for ae = i; ae < len(b) && ((b[ae] >= '0' && b[ae] <= '9') || b[ae] == '-' || b[ae] == '+' || b[ae] == '.'); ae++ {
+			}
+			i = ae + 1
 		}
 	}
 
-	a.v, err = fpdecimal.ParseFixedPointDecimal(rv, int8(a.c.Exponent()))
+	a.v, err = fpdecimal.ParseFixedPointDecimal(string(b[as:ae]), int8(a.c.Exponent()))
+
 	return err
 }
 
