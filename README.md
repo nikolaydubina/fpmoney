@@ -12,6 +12,7 @@
 * Fuzz tests
 * parsing is faster than `int`, `float`, `string`
 * 200 LOC
+* `int64` is enough to fit satoshi and wei
 
 ```go
 var BuySP500Price = fpmoney.FromInt(9000, iso4217.SGD)
@@ -61,6 +62,18 @@ Mismatched or missing currencies must be caught at testing or QA of your code.
 Two mechanisms to reduce panics are planned for future versions:
 1. package level var for enable/disable currency check
 2. package level var for fallback currency
+
+### Ultra Small Fractions
+
+Some denominatinos have very low fractions. 
+Storing them `int64` you would get. 
+
+- `BTC` _satoshi_ is `1 BTC = 100,000,000 satoshi`, which is still enough for ~`92,233,720,368 BTC`.
+- `ETH` _wei_ is `1 ETH = 1,000,000,000,000,000,000 wei`, which is ~`9 ETH`. If you deal with _wei_, you may consider `bigint` or multiple `int64`.
+
+Given that currency enumn still takes at least 1B in separate storage from `int64` in struct and Go allocates 16B of memory for struct regardless, current implementation reserved padding bytes.
+It is sensible to use extra space our ot 16B to support long integer arithmetics.
+Implementing this is area of furthter research.
 
 ### Benchmarks
 
