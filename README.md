@@ -12,7 +12,7 @@
 * Fuzz tests
 * parsing is faster than `int`, `float`, `string`
 * 200 LOC
-* `int64` is enough to fit enough of _satoshi_ and even few _wei_
+* `int64` can fit enough of _satoshi_ and even few _wei_
 
 ```go
 var BuySP500Price = fpmoney.FromInt(9000, iso4217.SGD)
