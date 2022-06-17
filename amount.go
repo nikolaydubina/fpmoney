@@ -5,7 +5,6 @@ import (
 
 	"github.com/ferdypruis/iso4217"
 	"github.com/nikolaydubina/fpdecimal"
-	"github.com/nikolaydubina/fpmoney/currency"
 	"golang.org/x/exp/constraints"
 )
 
@@ -126,7 +125,10 @@ func (a *Amount) UnmarshalJSON(b []byte) (err error) {
 				return NewErrUnmarshalJSONWrongCurrency(string(b[i:]))
 			}
 
-			a.c = currency.CastCurrency(b[i:e])
+			a.c, err = iso4217.FromAlpha(string(b[i:e]))
+			if err != nil {
+				return err
+			}
 			i = e
 		}
 

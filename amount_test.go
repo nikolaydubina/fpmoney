@@ -158,6 +158,9 @@ func FuzzJSONUnmarshal_Float(f *testing.F) {
 		if r > l || r < -l {
 			t.Skip()
 		}
+		if c == 0 {
+			t.Skip()
+		}
 
 		currency := iso4217.Currency(c)
 
@@ -174,7 +177,7 @@ func FuzzJSONUnmarshal_Float(f *testing.F) {
 
 		var x fpmoney.Amount
 		if err := json.Unmarshal([]byte(s), &x); err != nil {
-			t.Error(err)
+			t.Error(rs, currency, err)
 		}
 
 		if x.Currency() != currency {

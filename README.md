@@ -104,8 +104,10 @@ BenchmarkJSONUnmarshal/small-10              3339529           344.5 ns/op      
 BenchmarkJSONUnmarshal/large-10              2686135           443.2 ns/op         216 B/op           3 allocs/op
 ```
 
-Package `github.com/ferdypruis/iso4217` does cast of string to currency through loop.
+Package `github.com/ferdypruis/iso4217@v1.2.0` does cast of string to currency through loop.
 But we have predefined currencies, we can rely on compiler for that.
-Optimizing this cast.
-Avoiding mallocs.
-Avoiding loops.
+Optimizing this cast by avoiding mallocs and loops.
+
+As of `2022-06-17`, package `github.com/ferdypruis/iso4217@v1.2.1` uses map to cast currency.
+It is as efficient as switch case.
+Thanks @ferdypruis for the update!
