@@ -180,6 +180,11 @@ func NewErrCurrencyMismatch(a, b iso4217.Currency) error {
 	return &ErrCurrencyMismatch{a: a, b: b}
 }
 
+func (e *ErrCurrencyMismatch) Is(target error) bool {
+	t, ok := target.(*ErrCurrencyMismatch)
+	return ok && e != nil && t != nil && t.a == e.a && t.b == e.b
+}
+
 func (e *ErrCurrencyMismatch) Error() string {
 	if e == nil {
 		return ""

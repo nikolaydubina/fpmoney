@@ -2,6 +2,7 @@ package fpmoney_test
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"strconv"
@@ -210,7 +211,7 @@ func FuzzJSONUnmarshal_NoPanic(f *testing.F) {
 		"",
 		"123",
 		"'SGD'",
-		"sgd",
+		`"TDF"`,
 	}
 	for _, a := range amounts {
 		for _, c := range currencies {
@@ -689,4 +690,97 @@ func TestMemoryLayout(t *testing.T) {
 	if v := unsafe.Sizeof(a); v != 16 {
 		t.Error(a, v)
 	}
+}
+
+func TestArithmetic_WronCurrency(t *testing.T) {
+	tests := []struct {
+		a fpmoney.Amount
+		b fpmoney.Amount
+		f func(a, b fpmoney.Amount)
+		e error
+	}{
+		{
+			a: fpmoney.FromInt(10, iso4217.SGD),
+			b: fpmoney.FromInt(11, iso4217.USD),
+			f: func(a, b fpmoney.Amount) { a.Add(b) },
+			e: fpmoney.NewErrCurrencyMismatch(iso4217.SGD, iso4217.USD),
+		},
+		{
+			a: fpmoney.FromInt(10, iso4217.SGD),
+			b: fpmoney.FromInt(11, iso4217.USD),
+			f: func(a, b fpmoney.Amount) { a.Sub(b) },
+			e: fpmoney.NewErrCurrencyMismatch(iso4217.SGD, iso4217.USD),
+		},
+		{
+			a: fpmoney.FromInt(10, iso4217.SGD),
+			b: fpmoney.FromInt(11, iso4217.USD),
+			f: func(a, b fpmoney.Amount) { a.LessThan(b) },
+			e: fpmoney.NewErrCurrencyMismatch(iso4217.SGD, iso4217.USD),
+		},
+		{
+			a: fpmoney.FromInt(10, iso4217.SGD),
+			b: fpmoney.FromInt(11, iso4217.USD),
+			f: func(a, b fpmoney.Amount) { a.LessThanOrEqual(b) },
+			e: fpmoney.NewErrCurrencyMismatch(iso4217.SGD, iso4217.USD),
+		},
+		{
+			a: fpmoney.FromInt(10, iso4217.SGD),
+			b: fpmoney.FromInt(11, iso4217.USD),
+			f: func(a, b fpmoney.Amount) { a.GreaterThan(b) },
+			e: fpmoney.NewErrCurrencyMismatch(iso4217.SGD, iso4217.USD),
+		},
+		{
+			a: fpmoney.FromInt(10, iso4217.SGD),
+			b: fpmoney.FromInt(11, iso4217.USD),
+			f: func(a, b fpmoney.Amount) { a.GreaterThanOrEqual(b) },
+			e: fpmoney.NewErrCurrencyMismatch(iso4217.SGD, iso4217.USD),
+		},
+	}
+	for _, tc := range tests {
+		t.Run(fmt.Sprintf("%#v", tc), func(t *testing.T) {
+			defer func() {
+				r := recover()
+				re, ok := r.(error)
+				if !ok {
+					t.Error(r)
+				}
+				if !errors.Is(re, tc.e) {
+					t.Error(re, tc.e)
+				}
+			}()
+			tc.f(tc.a, tc.b)
+		})
+	}
+}
+
+func TestErrCurrencyMismatch_Error(t *testing.T) {
+	t.Run("nil", func(t *testing.T) {
+		var e *fpmoney.ErrCurrencyMismatch
+		if e.Error() != "" {
+			t.Error(e)
+		}
+	})
+
+	t.Run("error", func(t *testing.T) {
+		e := fpmoney.NewErrCurrencyMismatch(iso4217.SGD, iso4217.USD)
+		if e.Error() != "SGD != USD" {
+			t.Error(e)
+		}
+	})
+}
+
+func TestErrUnmarshalJSONWrongCurrency_Error(t *testing.T) {
+	t.Run("nil", func(t *testing.T) {
+		var e *fpmoney.ErrUnmarshalJSONWrongCurrency
+		if e.Error() != "" {
+			t.Error(e)
+		}
+	})
+
+	t.Run("error", func(t *testing.T) {
+		e := fpmoney.NewErrUnmarshalJSONWrongCurrency("asdf")
+		if e.Error() != "wrong currency: asdf" {
+			t.Error(e)
+		}
+	})
 }
