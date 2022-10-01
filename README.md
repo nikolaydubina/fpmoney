@@ -67,8 +67,8 @@ Two mechanisms to reduce panics are planned for future versions:
 
 ### Ultra Small Fractions
 
-Some denominatinos have very low fractions. 
-Storing them `int64` you would get. 
+Some denominatinos have very low fractions.
+Storing them `int64` you would get.
 
 - `BTC` _satoshi_ is `1 BTC = 100,000,000 satoshi`, which is still enough for ~`92,233,720,368 BTC`.
 - `ETH` _wei_ is `1 ETH = 1,000,000,000,000,000,000 wei`, which is ~`9 ETH`. If you deal with _wei_, you may consider `bigint` or multiple `int64`. In fact, official Ethereum code is in Go and it is using bigint ([code](https://github.com/ethereum/go-ethereum/blob/master/params/denomination.go)).
@@ -84,22 +84,57 @@ $ go test -bench=. -benchmem ./...
 goos: darwin
 goarch: arm64
 pkg: github.com/nikolaydubina/fpmoney
-BenchmarkArithmetic/add_x1-10                     1000000000             0.5492 ns/op        0 B/op           0 allocs/op
-BenchmarkArithmetic/add_x100-10                     18430124            64.64 ns/op          0 B/op           0 allocs/op
+BenchmarkArithmetic/add_x1-10                     1000000000             0.5 ns/op           0 B/op           0 allocs/op
+BenchmarkArithmetic/add_x100-10                     18430124            64.6 ns/op           0 B/op           0 allocs/op
 BenchmarkJSONUnmarshal/small-10                      3531835           340.7 ns/op         198 B/op           3 allocs/op
 BenchmarkJSONUnmarshal/large-10                      2791712           426.9 ns/op         216 B/op           3 allocs/op
-BenchmarkJSONUnmarshal_int/small-10                  2504600           478.5 ns/op         269 B/op           6 allocs/op
-BenchmarkJSONUnmarshal_int/large-10                  2294034           522.2 ns/op         288 B/op           7 allocs/op
-BenchmarkJSONUnmarshal_float32/small-10              2405636           496.9 ns/op         271 B/op           6 allocs/op
-BenchmarkJSONUnmarshal_float32/large-10              2122207           567.6 ns/op         312 B/op           7 allocs/op
 BenchmarkJSONMarshal/small-10                        4379685           274.4 ns/op         144 B/op           4 allocs/op
 BenchmarkJSONMarshal/large-10                        3321205           345.8 ns/op         192 B/op           5 allocs/op
-BenchmarkJSONMarshal_int/small-10                    8629840           138.6 ns/op          57 B/op           2 allocs/op
-BenchmarkJSONMarshal_int/large-10                    8318066           143.2 ns/op          72 B/op           2 allocs/op
-BenchmarkJSONMarshal_float32/small-10                6289126           189.9 ns/op          66 B/op           2 allocs/op
-BenchmarkJSONMarshal_float32/large-10                6819679           175.7 ns/op          72 B/op           2 allocs/op
 PASS
 ok      github.com/nikolaydubina/fpmoney    62.744s
+```
+
+Delta lift vs `float32` (old) vs `fpmoney` (new)
+```
+name                    old time/op    new time/op    delta
+JSONUnmarshal/small-10     502ns ± 0%     331ns ± 0%   -33.99%  (p=0.008 n=5+5)
+JSONUnmarshal/large-10     572ns ± 0%     414ns ± 0%   -27.64%  (p=0.008 n=5+5)
+JSONMarshal/small-10       189ns ± 0%     273ns ± 0%   +44.20%  (p=0.008 n=5+5)
+JSONMarshal/large-10       176ns ± 0%     340ns ± 0%   +93.29%  (p=0.008 n=5+5)
+
+name                    old alloc/op   new alloc/op   delta
+JSONUnmarshal/small-10      271B ± 0%      198B ± 0%   -26.94%  (p=0.008 n=5+5)
+JSONUnmarshal/large-10      312B ± 0%      216B ± 0%   -30.77%  (p=0.008 n=5+5)
+JSONMarshal/small-10       66.0B ± 0%    144.0B ± 0%  +118.18%  (p=0.008 n=5+5)
+JSONMarshal/large-10       72.0B ± 0%    192.0B ± 0%  +166.67%  (p=0.008 n=5+5)
+
+name                    old allocs/op  new allocs/op  delta
+JSONUnmarshal/small-10      6.00 ± 0%      3.00 ± 0%   -50.00%  (p=0.008 n=5+5)
+JSONUnmarshal/large-10      7.00 ± 0%      3.00 ± 0%   -57.14%  (p=0.008 n=5+5)
+JSONMarshal/small-10        2.00 ± 0%      4.00 ± 0%  +100.00%  (p=0.008 n=5+5)
+JSONMarshal/large-10        2.00 ± 0%      5.00 ± 0%  +150.00%  (p=0.008 n=5+5)
+```
+
+Comparison to `int` and `float32` for decoding
+```
+$ benchstat -split="XYZ" int.bench float32.bench fpmoney.bench
+name \ time/op          int.bench   float32.bench  fpmoney.bench
+JSONUnmarshal/small-10  481ns ± 2%     502ns ± 0%     331ns ± 0%
+JSONUnmarshal/large-10  530ns ± 1%     572ns ± 0%     414ns ± 0%
+JSONMarshal/small-10    140ns ± 1%     189ns ± 0%     273ns ± 0%
+JSONMarshal/large-10    145ns ± 0%     176ns ± 0%     340ns ± 0%
+
+name \ alloc/op         int.bench   float32.bench  fpmoney.bench
+JSONUnmarshal/small-10   269B ± 0%      271B ± 0%      198B ± 0%
+JSONUnmarshal/large-10   288B ± 0%      312B ± 0%      216B ± 0%
+JSONMarshal/small-10    57.0B ± 0%     66.0B ± 0%    144.0B ± 0%
+JSONMarshal/large-10    72.0B ± 0%     72.0B ± 0%    192.0B ± 0%
+
+name \ allocs/op        int.bench   float32.bench  fpmoney.bench
+JSONUnmarshal/small-10   6.00 ± 0%      6.00 ± 0%      3.00 ± 0%
+JSONUnmarshal/large-10   7.00 ± 0%      7.00 ± 0%      3.00 ± 0%
+JSONMarshal/small-10     2.00 ± 0%      2.00 ± 0%      4.00 ± 0%
+JSONMarshal/large-10     2.00 ± 0%      2.00 ± 0%      5.00 ± 0%
 ```
 
 ## Appendix A: json.Unmarshal optimizations
