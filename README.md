@@ -5,15 +5,13 @@
 [![Go Reference](https://pkg.go.dev/badge/github.com/nikolaydubina/fpmoney.svg)](https://pkg.go.dev/github.com/nikolaydubina/fpmoney)
 [![Mentioned in Awesome Go](https://awesome.re/mentioned-badge.svg)](https://github.com/avelino/awesome-go)
 
-* `ISO 4217`
 * as fast as `int64`
 * no `float` in parsing nor printing
-* zero overhead arithmetics
+* `ISO 4217` currency
 * block mismatched currency arithmetics
 * does not leak precision
-* Fuzz tests
-* parsing is faster than `int`, `float`, `string`
-* printing is similar to `int` and `float`, and as fast as `encoding/json` package allows
+* parsing faster than `int`, `float`, `string`
+* Fuzz tests, Benchmarks, Generics
 * 200 LOC
 
 ```go
