@@ -15,7 +15,6 @@
 * parsing is faster than `int`, `float`, `string`
 * printing is similar to `int` and `float`, and as fast as `encoding/json` package allows
 * 200 LOC
-* `int64` can fit enough of `BTC` _satoshi_ and even few `ETH` _wei_
 
 ```go
 var BuySP500Price = fpmoney.FromInt(9000, fpmoney.SGD)
