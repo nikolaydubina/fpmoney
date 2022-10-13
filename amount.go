@@ -1,8 +1,10 @@
 package fpmoney
 
 import (
+	"errors"
+
 	"github.com/nikolaydubina/fpdecimal"
-	"golang.org/x/exp/constraints"
+	"github.com/nikolaydubina/fpmoney/internal/constraints"
 )
 
 // Amount stores fixed-precision decimal money.
@@ -14,23 +16,25 @@ import (
 type Amount struct {
 	v int64
 	c Currency
+	_ uint8  // padding for improved line alignment, 2x improves arithmetics
+	_ uint32 // padding
 }
 
 func FromInt[T constraints.Integer](v T, currency Currency) Amount {
-	return Amount{v: int64(v) * currency.Scale(), c: currency}
+	return Amount{v: int64(v) * currency.scale(), c: currency}
 }
 
 func FromFloat[T constraints.Float](v T, currency Currency) Amount {
-	return Amount{v: int64(v) * currency.Scale(), c: currency}
+	return Amount{v: int64(T(v) * T(currency.scale())), c: currency}
 }
 
 func FromIntScaled[T constraints.Integer](v T, currency Currency) Amount {
 	return Amount{v: int64(v), c: currency}
 }
 
-func (a Amount) Float32() float32 { return float32(a.v) / float32(a.c.Scale()) }
+func (a Amount) Float32() float32 { return float32(a.v) / float32(a.c.scale()) }
 
-func (a Amount) Float64() float64 { return float64(a.v) / float64(a.c.Scale()) }
+func (a Amount) Float64() float64 { return float64(a.v) / float64(a.c.scale()) }
 
 func (a Amount) Currency() Currency { return a.c }
 
@@ -87,9 +91,8 @@ func (a Amount) String() string {
 }
 
 const (
-	keyCurrency = "currency"
-	keyAmount   = "amount"
-
+	keyCurrency       = "currency"
+	keyAmount         = "amount"
 	lenISO427Currency = 3
 )
 
@@ -105,19 +108,19 @@ func (a *Amount) UnmarshalJSON(b []byte) (err error) {
 
 	for i := 0; i < len(b); i++ {
 		// currency
-		if b[i] == 'c' && (i+len(keyCurrency)) <= len(b) && string(b[i:i+len(keyCurrency)]) == keyCurrency {
+		if b[i] == keyCurrency[0] && (i+len(keyCurrency)) <= len(b) && string(b[i:i+len(keyCurrency)]) == keyCurrency {
 			i += len(keyCurrency) + 2 // `":`
 
 			// find opening quote.
 			for ; i < len(b) && b[i] != '"'; i++ {
 			}
 			if i == len(b) {
-				return NewErrUnmarshalJSONWrongCurrency("missing json value")
+				return errors.New("wrong currency: " + "missing json value")
 			}
 			i++ // opening `"`
 			e = i + lenISO427Currency
 			if e > len(b) {
-				return NewErrUnmarshalJSONWrongCurrency(string(b[i:]))
+				return errors.New("wrong currency: " + string(b[i:]))
 			}
 
 			a.c, err = CurrencyFromAlpha(string(b[i:e]))
@@ -128,7 +131,7 @@ func (a *Amount) UnmarshalJSON(b []byte) (err error) {
 		}
 
 		// amount
-		if b[i] == 'a' && (i+len(keyCurrency)) <= len(b) && string(b[i:i+len(keyAmount)]) == keyAmount {
+		if b[i] == keyAmount[0] && (i+len(keyCurrency)) <= len(b) && string(b[i:i+len(keyAmount)]) == keyAmount {
 			i += len(keyAmount) + 2 // `":`
 			// go until find either number or + or -, which is a start of simple number.
 			for ; i < len(b) && (b[i] < '0' || b[i] > '9') && b[i] != '-' && b[i] != '+'; i++ {
@@ -142,7 +145,7 @@ func (a *Amount) UnmarshalJSON(b []byte) (err error) {
 	}
 
 	if a.c == Currency(0) {
-		return NewErrUnmarshalJSONWrongCurrency("not recognized")
+		return errors.New("wrong currency: " + "not recognized")
 	}
 
 	a.v, err = fpdecimal.ParseFixedPointDecimal(string(b[as:ae]), int8(a.c.Exponent()))
@@ -150,15 +153,17 @@ func (a *Amount) UnmarshalJSON(b []byte) (err error) {
 	return err
 }
 
-var template []byte = []byte(`{"amount":,"currency":""}`)
-
 func (a Amount) MarshalJSON() ([]byte, error) {
 	b := make([]byte, 0, 100)
-	b = append(b, template[:10]...)
+	b = append(b, `{"`...)
+	b = append(b, keyAmount...)
+	b = append(b, `":`...)
 	b = fpdecimal.AppendFixedPointDecimal(b, a.v, a.c.Exponent())
-	b = append(b, template[10:23]...)
-	b = append(b, currencies[a.c].alphaBytes...)
-	b = append(b, template[23:]...)
+	b = append(b, `,"`...)
+	b = append(b, keyCurrency...)
+	b = append(b, `":"`...)
+	b = append(b, currencies[a.c].alpha...)
+	b = append(b, `"}`...)
 	return b, nil
 }
 
@@ -182,19 +187,4 @@ func (e *ErrCurrencyMismatch) Error() string {
 		return ""
 	}
 	return e.a.Alpha() + " != " + e.b.Alpha()
-}
-
-type ErrUnmarshalJSONWrongCurrency struct {
-	s string
-}
-
-func NewErrUnmarshalJSONWrongCurrency(s string) *ErrUnmarshalJSONWrongCurrency {
-	return &ErrUnmarshalJSONWrongCurrency{s: s}
-}
-
-func (e *ErrUnmarshalJSONWrongCurrency) Error() string {
-	if e == nil {
-		return ""
-	}
-	return "wrong currency: " + e.s
 }

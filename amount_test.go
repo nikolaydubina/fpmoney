@@ -49,6 +49,12 @@ func ExampleDiv_whole() {
 	// Output: 0.20 SGD 0 SGD
 }
 
+func ExampleFromFloat() {
+	x := fpmoney.FromFloat(144.96, fpmoney.SGD)
+	fmt.Println(x)
+	// Output: 144.96 SGD
+}
+
 func FuzzArithmetics(f *testing.F) {
 	tests := [][2]int64{
 		{1, 2},
@@ -57,13 +63,13 @@ func FuzzArithmetics(f *testing.F) {
 		{1100, -2},
 	}
 	for _, tc := range tests {
-		f.Add(tc[0], tc[1], uint16(fpmoney.KRW))
-		f.Add(tc[0], tc[1], uint16(fpmoney.SGD))
-		f.Add(tc[0], tc[1], uint16(fpmoney.BHD))
-		f.Add(tc[0], tc[1], uint16(fpmoney.CLF))
+		f.Add(tc[0], tc[1], uint8(fpmoney.KRW))
+		f.Add(tc[0], tc[1], uint8(fpmoney.SGD))
+		f.Add(tc[0], tc[1], uint8(fpmoney.BHD))
+		f.Add(tc[0], tc[1], uint8(fpmoney.CLF))
 	}
-	f.Fuzz(func(t *testing.T, a, b int64, c uint16) {
-		if c > 300 || c == 0 {
+	f.Fuzz(func(t *testing.T, a, b int64, c uint8) {
+		if c > 180 || c == 0 {
 			t.Skip()
 		}
 		currency := fpmoney.Currency(c)
@@ -138,18 +144,18 @@ func FuzzJSONUnmarshal_Float(f *testing.F) {
 		12345678,
 	}
 	for _, tc := range tests {
-		f.Add(tc, uint16(fpmoney.KRW), uint8(5))
-		f.Add(tc, uint16(fpmoney.SGD), uint8(5))
-		f.Add(tc, uint16(fpmoney.BHD), uint8(5))
-		f.Add(tc, uint16(fpmoney.CLF), uint8(5))
+		f.Add(tc, uint8(fpmoney.KRW), uint8(5))
+		f.Add(tc, uint8(fpmoney.SGD), uint8(5))
+		f.Add(tc, uint8(fpmoney.BHD), uint8(5))
+		f.Add(tc, uint8(fpmoney.CLF), uint8(5))
 
-		f.Add(-tc, uint16(fpmoney.KRW), uint8(5))
-		f.Add(-tc, uint16(fpmoney.SGD), uint8(5))
-		f.Add(-tc, uint16(fpmoney.BHD), uint8(5))
-		f.Add(-tc, uint16(fpmoney.CLF), uint8(5))
+		f.Add(-tc, uint8(fpmoney.KRW), uint8(5))
+		f.Add(-tc, uint8(fpmoney.SGD), uint8(5))
+		f.Add(-tc, uint8(fpmoney.BHD), uint8(5))
+		f.Add(-tc, uint8(fpmoney.CLF), uint8(5))
 	}
-	f.Fuzz(func(t *testing.T, r float32, c uint16, nf uint8) {
-		if c > 300 {
+	f.Fuzz(func(t *testing.T, r float32, c uint8, nf uint8) {
+		if c > 180 {
 			t.Skip()
 		}
 		if nf > 10 {
@@ -430,18 +436,18 @@ func FuzzJSON_MarshalUnmarshal(f *testing.F) {
 		1,
 	}
 	for _, tc := range tests {
-		f.Add(tc, uint16(fpmoney.KRW))
-		f.Add(tc, uint16(fpmoney.SGD))
-		f.Add(tc, uint16(fpmoney.BHD))
-		f.Add(tc, uint16(fpmoney.CLF))
+		f.Add(tc, uint8(fpmoney.KRW))
+		f.Add(tc, uint8(fpmoney.SGD))
+		f.Add(tc, uint8(fpmoney.BHD))
+		f.Add(tc, uint8(fpmoney.CLF))
 
-		f.Add(-tc, uint16(fpmoney.KRW))
-		f.Add(-tc, uint16(fpmoney.SGD))
-		f.Add(-tc, uint16(fpmoney.BHD))
-		f.Add(-tc, uint16(fpmoney.CLF))
+		f.Add(-tc, uint8(fpmoney.KRW))
+		f.Add(-tc, uint8(fpmoney.SGD))
+		f.Add(-tc, uint8(fpmoney.BHD))
+		f.Add(-tc, uint8(fpmoney.CLF))
 	}
-	f.Fuzz(func(t *testing.T, v int64, c uint16) {
-		if c > 300 || c == 0 {
+	f.Fuzz(func(t *testing.T, v int64, c uint8) {
+		if c > 180 || c == 0 {
 			t.Skip()
 		}
 
@@ -551,6 +557,35 @@ func BenchmarkJSONMarshal(b *testing.B) {
 	}
 }
 
+func BenchmarkJSONMarshal_Exact(b *testing.B) {
+	var s []byte
+	var err error
+	for _, tc := range testsFloats {
+		tests := make([]fpmoney.Amount, 0, len(tc.vals))
+		for _, q := range tc.vals {
+			var x fpmoney.Amount
+			if err := json.Unmarshal([]byte(q), &x); err != nil {
+				b.Error(err)
+			}
+			tests = append(tests, x)
+			tests = append(tests, x.Mul(-1))
+		}
+
+		b.ResetTimer()
+		b.Run(tc.name, func(b *testing.B) {
+			for n := 0; n < b.N; n++ {
+				s, err = tests[n%len(tc.vals)].MarshalJSON()
+				if err != nil {
+					b.Error(err)
+				}
+				if string(s) == "" {
+					b.Error("empty str")
+				}
+			}
+		})
+	}
+}
+
 func TestArithmetic_WrongCurrency(t *testing.T) {
 	tests := []struct {
 		a fpmoney.Amount
@@ -623,22 +658,6 @@ func TestErrCurrencyMismatch_Error(t *testing.T) {
 	t.Run("error", func(t *testing.T) {
 		e := fpmoney.NewErrCurrencyMismatch(fpmoney.SGD, fpmoney.USD)
 		if e.Error() != "SGD != USD" {
-			t.Error(e)
-		}
-	})
-}
-
-func TestErrUnmarshalJSONWrongCurrency_Error(t *testing.T) {
-	t.Run("nil", func(t *testing.T) {
-		var e *fpmoney.ErrUnmarshalJSONWrongCurrency
-		if e.Error() != "" {
-			t.Error(e)
-		}
-	})
-
-	t.Run("error", func(t *testing.T) {
-		e := fpmoney.NewErrUnmarshalJSONWrongCurrency("asdf")
-		if e.Error() != "wrong currency: asdf" {
 			t.Error(e)
 		}
 	})
