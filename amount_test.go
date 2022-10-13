@@ -35,18 +35,39 @@ func ExampleAmount() {
 	// Output: 18000.04 SGD
 }
 
-func ExampleDiv_remainder() {
+func ExampleAmount_Div_part() {
 	x := fpmoney.FromInt(1, fpmoney.SGD)
 	a, r := x.Div(3)
 	fmt.Println(a, r)
 	// Output: 0.33 SGD 0.01 SGD
 }
 
-func ExampleDiv_whole() {
+func ExampleAmount_Div_whole() {
 	x := fpmoney.FromInt(1, fpmoney.SGD)
 	a, r := x.Div(5)
 	fmt.Println(a, r)
 	// Output: 0.20 SGD 0 SGD
+}
+
+func ExampleAmount_equality() {
+	x := fpmoney.FromInt(3, fpmoney.SGD)
+	y := fpmoney.FromInt(9, fpmoney.SGD)
+	fmt.Println(y == x.Mul(3))
+	// Output: true
+}
+
+func ExampleAmount_equality_same_currency() {
+	x := fpmoney.FromInt(10, fpmoney.SGD)
+	y := fpmoney.FromInt(10, fpmoney.SGD)
+	fmt.Println(y == x)
+	// Output: true
+}
+
+func ExampleAmount_equality_wrong_currency() {
+	x := fpmoney.FromInt(10, fpmoney.USD)
+	y := fpmoney.FromInt(10, fpmoney.SGD)
+	fmt.Println(y == x)
+	// Output: false
 }
 
 func ExampleFromFloat() {
@@ -325,16 +346,16 @@ func TestUnmarshalJSON(t *testing.T) {
 		// 2 cents strange valid input
 		{
 			s: `    {   "amount" : 9002.01
-			
-			, 
-			
-			"currency"
-			    : 
-			
-			"SGD"}   
+            
+            , 
+            
+            "currency"
+                : 
+            
+            "SGD"}   
 
 
-			 `,
+             `,
 			v: fpmoney.FromIntScaled(900201, fpmoney.SGD),
 		},
 	}

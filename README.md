@@ -52,6 +52,17 @@ fmt.Println(a, r)
 // Output: 0.20 SGD 0 SGD
 ```
 
+### Equality
+
+Equality operator can be used to compare values.
+
+```go
+x := fpmoney.FromInt(3, fpmoney.SGD)
+y := fpmoney.FromInt(9, fpmoney.SGD)
+fmt.Println(y == x.Mul(3))
+// Output: true
+```
+
 ### Cross Currency Protection
 
 Akin to integer division by 0, which panics in Go, arithmetic operations on differnet currenices result in panic.
@@ -62,6 +73,21 @@ Mismatched or missing currencies must be caught at testing or QA of your code.
 Two mechanisms to reduce panics are planned for future versions:
 1. package level var for enable/disable currency check
 2. package level var for fallback currency
+
+Arithmetics
+```go
+x := fpmoney.FromInt(10, fpmoney.USD)
+y := fpmoney.FromInt(10, fpmoney.SGD)
+c := x.Add(y) // panics
+```
+
+Equality
+```go
+x := fpmoney.FromInt(10, fpmoney.USD)
+y := fpmoney.FromInt(10, fpmoney.SGD)
+fmt.Println(y == x)
+// Output: false
+```
 
 ### Ultra Small Fractions
 
@@ -138,7 +164,7 @@ JSONMarshal/small-10         2.00 ± 0%      2.00 ± 0%      3.00 ± 0%
 JSONMarshal/large-10         2.00 ± 0%      2.00 ± 0%      3.00 ± 0%
 ```
 
-## Appendix A: json.Unmarshal optimizations
+## Appendix A: `json.Unmarshal` optimizations
 
 Parsing is surprisingly slow. It is ~6x of `float32` + `string`.
 
