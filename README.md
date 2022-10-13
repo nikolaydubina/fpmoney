@@ -84,14 +84,14 @@ $ go test -bench=. -benchmem ./...
 goos: darwin
 goarch: arm64
 pkg: github.com/nikolaydubina/fpmoney
-BenchmarkArithmetic/add_x1-10    	            1000000000	         0.5 ns/op	       0 B/op	       0 allocs/op
-BenchmarkArithmetic/add_x100-10  	              12525424	        51.9 ns/op	       0 B/op	       0 allocs/op
-BenchmarkJSONUnmarshal/small-10  	               3610992	       329.8 ns/op	     198 B/op	       3 allocs/op
-BenchmarkJSONUnmarshal/large-10  	               2901363	       412.4 ns/op	     216 B/op	       3 allocs/op
-BenchmarkJSONMarshal/small-10    	               5032456	       238.1 ns/op	     160 B/op	       3 allocs/op
-BenchmarkJSONMarshal/large-10    	               4072776	       295.5 ns/op	     176 B/op	       3 allocs/op
-BenchmarkJSONMarshal_Exact/small-10         	  40404832	        29.6 ns/op	     112 B/op	       1 allocs/op
-BenchmarkJSONMarshal_Exact/large-10               28532677	        41.6 ns/op	     112 B/op	       1 allocs/op
+BenchmarkArithmetic/add_x1-10                   1000000000             0.5 ns/op           0 B/op           0 allocs/op
+BenchmarkArithmetic/add_x100-10                   12525424            51.9 ns/op           0 B/op           0 allocs/op
+BenchmarkJSONUnmarshal/small-10                    3610992           329.8 ns/op         198 B/op           3 allocs/op
+BenchmarkJSONUnmarshal/large-10                    2901363           412.4 ns/op         216 B/op           3 allocs/op
+BenchmarkJSONMarshal/small-10                      5032456           238.1 ns/op         160 B/op           3 allocs/op
+BenchmarkJSONMarshal/large-10                      4072776           295.5 ns/op         176 B/op           3 allocs/op
+BenchmarkJSONMarshal_Exact/small-10               40404832            29.6 ns/op         112 B/op           1 allocs/op
+BenchmarkJSONMarshal_Exact/large-10               28532677            41.6 ns/op         112 B/op           1 allocs/op
 PASS
 ok      github.com/nikolaydubina/fpmoney    62.744s
 ```
@@ -177,16 +177,26 @@ As of `2022-06-17`, package `github.com/ferdypruis/iso4217@v1.2.1` uses map to c
 It is as efficient as switch case.
 Thanks @ferdypruis for the update!
 
-## Appendix B: differences of currency from `github.com/ferdypruis/iso4217`
+## Appendix B: Other Libraries
 
+`github.com/shopspring/decimal`
+* fixed precision
+* faster printing/parsing/arithmetics
+* currency handling 
+
+`github.com/Rhymond/go-money`
+* does not use `float` or `interface{}` in parsing
+* currency is enum
+
+`github.com/ferdypruis/iso4217`
 * skipped deprecated currencies to fit into `uint8` and smaller struct size
 
-## Appendix C: extra allocation for printing
+## Appendix C: Extra malloc in Printing
 
 Even though `MarshalJSON` does exactly one malloc, using it with `json.Marshall` package adds two more mallocs.
 This looks like penalty of reflect nature of `json` package and is unavoidable.
 
 ```
-BenchmarkJSONMarshal_Exact/small-10         	40682985	        29.74 ns/op	      64 B/op	       1 allocs/op
-BenchmarkJSONMarshal_Exact/large-10         	28508104	        41.97 ns/op	      64 B/op	       1 allocs/op
+BenchmarkJSONMarshal_Exact/small-10     40404832    29.6 ns/op      112 B/op        1 allocs/op
+BenchmarkJSONMarshal_Exact/large-10     28532677    41.6 ns/op      112 B/op        1 allocs/op
 ```
