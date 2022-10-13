@@ -180,8 +180,6 @@ Thanks @ferdypruis for the update!
 
 ## Appendix B: differences of currency from `github.com/ferdypruis/iso4217`
 
-* new method `AppendCurrency(b []byte) []byte` for faster printing
-* new feild `scale`
 * skipped deprecated currencies to fit into `uint8` and smaller struct size
 
 ## Appendix C: extra allocation for printing
