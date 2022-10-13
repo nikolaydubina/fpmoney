@@ -1,9 +1,6 @@
 package fpmoney
 
 import (
-	"strings"
-
-	"github.com/ferdypruis/iso4217"
 	"github.com/nikolaydubina/fpdecimal"
 	"golang.org/x/exp/constraints"
 )
@@ -16,28 +13,26 @@ import (
 // Blocking arithmetic operations that result in loss of precision.
 type Amount struct {
 	v int64
-	c iso4217.Currency
-	_ uint16 // padding
-	_ uint32 // padding
+	c Currency
 }
 
-func FromInt[T constraints.Integer](v T, currency iso4217.Currency) Amount {
-	return Amount{v: int64(v) * scale(currency), c: currency}
+func FromInt[T constraints.Integer](v T, currency Currency) Amount {
+	return Amount{v: int64(v) * currency.Scale(), c: currency}
 }
 
-func FromFloat[T constraints.Float](v T, currency iso4217.Currency) Amount {
-	return Amount{v: int64(v) * scale(currency), c: currency}
+func FromFloat[T constraints.Float](v T, currency Currency) Amount {
+	return Amount{v: int64(v) * currency.Scale(), c: currency}
 }
 
-func FromIntScaled[T constraints.Integer](v T, currency iso4217.Currency) Amount {
+func FromIntScaled[T constraints.Integer](v T, currency Currency) Amount {
 	return Amount{v: int64(v), c: currency}
 }
 
-func (a Amount) Float32() float32 { return float32(a.v) / float32(scale(a.c)) }
+func (a Amount) Float32() float32 { return float32(a.v) / float32(a.c.Scale()) }
 
-func (a Amount) Float64() float64 { return float64(a.v) / float64(scale(a.c)) }
+func (a Amount) Float64() float64 { return float64(a.v) / float64(a.c.Scale()) }
 
-func (a Amount) Currency() iso4217.Currency { return a.c }
+func (a Amount) Currency() Currency { return a.c }
 
 func (a Amount) Add(b Amount) Amount {
 	if a.c != b.c {
@@ -125,7 +120,7 @@ func (a *Amount) UnmarshalJSON(b []byte) (err error) {
 				return NewErrUnmarshalJSONWrongCurrency(string(b[i:]))
 			}
 
-			a.c, err = iso4217.FromAlpha(string(b[i:e]))
+			a.c, err = CurrencyFromAlpha(string(b[i:e]))
 			if err != nil {
 				return err
 			}
@@ -146,7 +141,7 @@ func (a *Amount) UnmarshalJSON(b []byte) (err error) {
 		}
 	}
 
-	if a.c == iso4217.Currency(0) {
+	if a.c == Currency(0) {
 		return NewErrUnmarshalJSONWrongCurrency("not recognized")
 	}
 
@@ -155,28 +150,25 @@ func (a *Amount) UnmarshalJSON(b []byte) (err error) {
 	return err
 }
 
+var template []byte = []byte(`{"amount":,"currency":""}`)
+
 func (a Amount) MarshalJSON() ([]byte, error) {
-	var b strings.Builder
-	b.Grow(50)
-	b.WriteRune('{')
-	b.WriteString(`"amount":`)
-	b.WriteString(fpdecimal.FixedPointDecimalToString(a.v, a.c.Exponent()))
-	b.WriteString(`,`)
-	b.WriteString(`"currency":`)
-	b.WriteRune('"')
-	b.WriteString(a.c.Alpha())
-	b.WriteRune('"')
-	b.WriteRune('}')
-	return []byte(b.String()), nil
+	b := make([]byte, 0, 100)
+	b = append(b, template[:10]...)
+	b = fpdecimal.AppendFixedPointDecimal(b, a.v, a.c.Exponent())
+	b = append(b, template[10:23]...)
+	b = append(b, currencies[a.c].alphaBytes...)
+	b = append(b, template[23:]...)
+	return b, nil
 }
 
 // ErrCurrencyMismatch is a lazy error for mismatched ISO 4217 currencies.
 type ErrCurrencyMismatch struct {
-	a iso4217.Currency
-	b iso4217.Currency
+	a Currency
+	b Currency
 }
 
-func NewErrCurrencyMismatch(a, b iso4217.Currency) error {
+func NewErrCurrencyMismatch(a, b Currency) error {
 	return &ErrCurrencyMismatch{a: a, b: b}
 }
 
@@ -205,17 +197,4 @@ func (e *ErrUnmarshalJSONWrongCurrency) Error() string {
 		return ""
 	}
 	return "wrong currency: " + e.s
-}
-
-func scale(currency iso4217.Currency) int64 {
-	switch currency.Exponent() {
-	case 4:
-		return 10000
-	case 3:
-		return 1000
-	case 2:
-		return 100
-	default:
-		return 1
-	}
 }

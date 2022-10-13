@@ -96,6 +96,7 @@ ok      github.com/nikolaydubina/fpmoney    62.744s
 
 Delta lift vs `float32` (old) vs `fpmoney` (new)
 ```
+$ benchstat -split="XYZ" float32.bench fpmoney.bench
 name                    old time/op    new time/op    delta
 JSONUnmarshal/small-10     502ns ± 0%     331ns ± 0%   -33.99%  (p=0.008 n=5+5)
 JSONUnmarshal/large-10     572ns ± 0%     414ns ± 0%   -27.64%  (p=0.008 n=5+5)
@@ -173,3 +174,9 @@ Optimizing this cast by avoiding mallocs and loops.
 As of `2022-06-17`, package `github.com/ferdypruis/iso4217@v1.2.1` uses map to cast currency.
 It is as efficient as switch case.
 Thanks @ferdypruis for the update!
+
+## Appendix B: differences of currency from `github.com/ferdypruis/iso4217`
+
+* new method `AppendCurrency(b []byte) []byte` for faster printing
+* new feild `scale`
+* skipped deprecated currencies to fit into `uint8` and smaller struct size
