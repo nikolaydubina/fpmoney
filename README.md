@@ -13,7 +13,7 @@
 * does not leak precision
 * Fuzz tests
 * parsing is faster than `int`, `float`, `string`
-* printing is similar to `int` and `float`, as fast as `encoding/json` package allows
+* printing is similar to `int` and `float`, and as fast as `encoding/json` package allows
 * 200 LOC
 * `int64` can fit enough of `BTC` _satoshi_ and even few `ETH` _wei_
 
