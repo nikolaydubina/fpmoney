@@ -120,7 +120,7 @@ PASS
 ok      github.com/nikolaydubina/fpmoney    62.744s
 ```
 
-Delta lift `float32` (old) to `fpmoney` (new)
+`float32` (old) and `fpmoney` (new)
 ```
 $ benchstat -split="XYZ" float32.bench fpmoney.bench
 name                    old time/op    new time/op    delta
@@ -142,7 +142,7 @@ JSONMarshal/small-10        2.00 ± 0%      3.00 ± 0%   +50.00%  (p=0.008 n=5+5
 JSONMarshal/large-10        2.00 ± 0%      3.00 ± 0%   +50.00%  (p=0.008 n=5+5)
 ```
 
-Comparison to `int` and `float32` for decoding
+`int`, `float32`, `fpmoney`
 ```
 $ benchstat -split="XYZ" int.bench float32.bench fpmoney.bench
 name \ time/op              int.bench   float32.bench  fpmoney.bench
