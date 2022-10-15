@@ -120,7 +120,7 @@ PASS
 ok      github.com/nikolaydubina/fpmoney    62.744s
 ```
 
-Delta lift vs `float32` (old) vs `fpmoney` (new)
+Delta lift `float32` (old) to `fpmoney` (new)
 ```
 $ benchstat -split="XYZ" float32.bench fpmoney.bench
 name                    old time/op    new time/op    delta
