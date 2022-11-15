@@ -144,7 +144,7 @@ func (a *Amount) UnmarshalJSON(b []byte) (err error) {
 		}
 	}
 
-	if a.c == Currency(0) {
+	if (a.c == Currency{}) {
 		return errors.New("wrong currency: " + "not recognized")
 	}
 

@@ -77,6 +77,13 @@ func ExampleFromFloat() {
 }
 
 func FuzzArithmetics(f *testing.F) {
+	currencies := [...]fpmoney.Currency{
+		fpmoney.KRW,
+		fpmoney.SGD,
+		fpmoney.BHD,
+		fpmoney.CLF,
+	}
+
 	tests := [][2]int64{
 		{1, 2},
 		{1, -5},
@@ -84,16 +91,15 @@ func FuzzArithmetics(f *testing.F) {
 		{1100, -2},
 	}
 	for _, tc := range tests {
-		f.Add(tc[0], tc[1], uint8(fpmoney.KRW))
-		f.Add(tc[0], tc[1], uint8(fpmoney.SGD))
-		f.Add(tc[0], tc[1], uint8(fpmoney.BHD))
-		f.Add(tc[0], tc[1], uint8(fpmoney.CLF))
+		for i := range currencies {
+			f.Add(tc[0], tc[1], i)
+		}
 	}
-	f.Fuzz(func(t *testing.T, a, b int64, c uint8) {
-		if c > 180 || c == 0 {
+	f.Fuzz(func(t *testing.T, a, b int64, c int) {
+		if c > len(currencies)-1 || c < 0 {
 			t.Skip()
 		}
-		currency := fpmoney.Currency(c)
+		currency := currencies[c]
 
 		fa := fpmoney.FromIntScaled(a, currency)
 		fb := fpmoney.FromIntScaled(b, currency)
@@ -146,6 +152,13 @@ func FuzzArithmetics(f *testing.F) {
 }
 
 func FuzzJSONUnmarshal_Float(f *testing.F) {
+	currencies := [...]fpmoney.Currency{
+		fpmoney.KRW,
+		fpmoney.SGD,
+		fpmoney.BHD,
+		fpmoney.CLF,
+	}
+
 	tests := []float32{
 		0,
 		0.100,
@@ -165,18 +178,13 @@ func FuzzJSONUnmarshal_Float(f *testing.F) {
 		12345678,
 	}
 	for _, tc := range tests {
-		f.Add(tc, uint8(fpmoney.KRW), uint8(5))
-		f.Add(tc, uint8(fpmoney.SGD), uint8(5))
-		f.Add(tc, uint8(fpmoney.BHD), uint8(5))
-		f.Add(tc, uint8(fpmoney.CLF), uint8(5))
-
-		f.Add(-tc, uint8(fpmoney.KRW), uint8(5))
-		f.Add(-tc, uint8(fpmoney.SGD), uint8(5))
-		f.Add(-tc, uint8(fpmoney.BHD), uint8(5))
-		f.Add(-tc, uint8(fpmoney.CLF), uint8(5))
+		for i := range currencies {
+			f.Add(tc, i, uint8(5))
+			f.Add(-tc, i, uint8(5))
+		}
 	}
-	f.Fuzz(func(t *testing.T, r float32, c uint8, nf uint8) {
-		if c > 180 {
+	f.Fuzz(func(t *testing.T, r float32, c int, nf uint8) {
+		if c > len(currencies)-1 || c < 0 {
 			t.Skip()
 		}
 		if nf > 10 {
@@ -190,7 +198,7 @@ func FuzzJSONUnmarshal_Float(f *testing.F) {
 			t.Skip()
 		}
 
-		currency := fpmoney.Currency(c)
+		currency := currencies[c]
 
 		fs := `%.` + strconv.Itoa(int(nf)) + `f`
 		rs := fmt.Sprintf(fs, r)
@@ -451,28 +459,31 @@ func TestMarshalJSON(t *testing.T) {
 }
 
 func FuzzJSON_MarshalUnmarshal(f *testing.F) {
+	currencies := [...]fpmoney.Currency{
+		fpmoney.KRW,
+		fpmoney.SGD,
+		fpmoney.BHD,
+		fpmoney.CLF,
+	}
+
 	tests := []int64{
 		123456,
 		0,
 		1,
 	}
 	for _, tc := range tests {
-		f.Add(tc, uint8(fpmoney.KRW))
-		f.Add(tc, uint8(fpmoney.SGD))
-		f.Add(tc, uint8(fpmoney.BHD))
-		f.Add(tc, uint8(fpmoney.CLF))
-
-		f.Add(-tc, uint8(fpmoney.KRW))
-		f.Add(-tc, uint8(fpmoney.SGD))
-		f.Add(-tc, uint8(fpmoney.BHD))
-		f.Add(-tc, uint8(fpmoney.CLF))
+		for i := range currencies {
+			f.Add(tc, i)
+			f.Add(-tc, i)
+		}
 	}
-	f.Fuzz(func(t *testing.T, v int64, c uint8) {
-		if c > 180 || c == 0 {
+	f.Fuzz(func(t *testing.T, v int64, c int) {
+		if c > len(currencies)-1 || c < 0 {
 			t.Skip()
 		}
 
-		q := fpmoney.FromIntScaled(v, fpmoney.Currency(c))
+		currency := currencies[c]
+		q := fpmoney.FromIntScaled(v, currency)
 
 		s, err := json.Marshal(q)
 		if err != nil {

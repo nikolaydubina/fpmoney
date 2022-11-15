@@ -6,8 +6,8 @@ import (
 )
 
 func TestCurrency(t *testing.T) {
-	if len(currencies) != (numCurrencies + 1) {
-		t.Errorf("wrong number of currencies(%d) exp(%d)", len(currencies), numCurrencies+1)
+	if len(currencies) != (numCurrencies - 2) {
+		t.Errorf("wrong number of currencies(%d) exp(%d)", len(currencies), numCurrencies-2)
 	}
 	if len(fromAlpha) != numCurrencies {
 		t.Errorf("wrong number of currencies(%d) exp(%d)", len(fromAlpha), numCurrencies)
@@ -70,7 +70,7 @@ func TestCurrencyTextEncoding_Error(t *testing.T) {
 			if err == nil {
 				t.Error("expected error")
 			}
-			if v != Currency(0) {
+			if (v != Currency{}) {
 				t.Error("wrong zero currency")
 			}
 		})

@@ -224,3 +224,10 @@ This looks like penalty of reflect nature of `json` package and is unavoidable.
 BenchmarkJSONMarshal_Exact/small-10     40404832    29.6 ns/op      112 B/op        1 allocs/op
 BenchmarkJSONMarshal_Exact/large-10     28532677    41.6 ns/op      112 B/op        1 allocs/op
 ```
+
+## Appendix D: Strict Currency Enum
+
+It is possible to rely on Go compiler to strictiy currency enum by wrapping into a struct.
+There is no performance penalty.
+Implementation is almost same.
+API is the same, but much safer.

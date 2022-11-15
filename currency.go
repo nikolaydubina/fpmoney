@@ -4,7 +4,7 @@ import "errors"
 
 // Currency is ISO 4217 without deprecated currencies.
 // Zero value is undefined currency.
-type Currency uint8
+type Currency struct{ v uint8 }
 
 // Alpha returns the ISO 4217 three-letter alphabetic code.
 func (c Currency) Alpha() string { return currencies[c].alpha }
@@ -31,7 +31,7 @@ func CurrencyFromAlpha(alpha string) (Currency, error) {
 	if c, ok := fromAlpha[alpha]; ok {
 		return c, nil
 	}
-	return Currency(0), errors.New("no currency exists with alphabetic code " + alpha)
+	return Currency{}, errors.New("no currency exists with alphabetic code " + alpha)
 }
 
 func (c Currency) scale() int64 {
@@ -50,191 +50,375 @@ func (c Currency) scale() int64 {
 const numCurrencies = 181
 
 const (
-	_ Currency = iota
-	AED
-	AFN
-	ALL
-	AMD
-	ANG
-	AOA
-	ARS
-	AUD
-	AWG
-	AZN
-	BAM
-	BBD
-	BDT
-	BGN
-	BHD
-	BIF
-	BMD
-	BND
-	BOB
-	BOV
-	BRL
-	BSD
-	BTN
-	BWP
-	BYN
-	BZD
-	CAD
-	CDF
-	CHE
-	CHF
-	CHW
-	CLF
-	CLP
-	CNY
-	COP
-	COU
-	CRC
-	CUP
-	CVE
-	CZK
-	DJF
-	DKK
-	DOP
-	DZD
-	EGP
-	ERN
-	ETB
-	EUR
-	FJD
-	FKP
-	GBP
-	GEL
-	GHS
-	GIP
-	GMD
-	GNF
-	GTQ
-	GYD
-	HKD
-	HNL
-	HRD
-	HRK
-	HTG
-	HUF
-	IDR
-	ILS
-	INR
-	IQD
-	IRR
-	ISK
-	JMD
-	JOD
-	JPY
-	KES
-	KGS
-	KHR
-	KMF
-	KPW
-	KRW
-	KWD
-	KYD
-	KZT
-	LAK
-	LBP
-	LKR
-	LRD
-	LSL
-	LYD
-	MAD
-	MDL
-	MGA
-	MKD
-	MMK
-	MNT
-	MOP
-	MRU
-	MUR
-	MVR
-	MWK
-	MXN
-	MXV
-	MYR
-	MZN
-	NAD
-	NGN
-	NIO
-	NOK
-	NPR
-	NZD
-	OMR
-	PAB
-	PEN
-	PGK
-	PHP
-	PKR
-	PLN
-	PYG
-	QAR
-	RON
-	RSD
-	RUB
-	RWF
-	SAR
-	SBD
-	SCR
-	SDG
-	SEK
-	SGD
-	SHP
-	SLE
-	SLL
-	SOS
-	SRD
-	SSP
-	STN
-	SVC
-	SYP
-	SZL
-	THB
-	TJS
-	TMT
-	TND
-	TOP
-	TRY
-	TTD
-	TWD
-	TZS
-	UAH
-	UGX
-	USD
-	USN
-	UYI
-	UYU
-	UYW
-	UZS
-	VED
-	VES
-	VND
-	VUV
-	WST
-	XAF
-	XAG
-	XAU
-	XBA
-	XBB
-	XBC
-	XBD
-	XCD
-	XDR
-	XOF
-	XPD
-	XPF
-	XPT
-	XSU
-	XTS
-	XUA
-	XXX
-	YER
-	ZAR
-	ZMW
-	ZWL
+	_ uint8 = iota
+	_AED
+	_AFN
+	_ALL
+	_AMD
+	_ANG
+	_AOA
+	_ARS
+	_AUD
+	_AWG
+	_AZN
+	_BAM
+	_BBD
+	_BDT
+	_BGN
+	_BHD
+	_BIF
+	_BMD
+	_BND
+	_BOB
+	_BOV
+	_BRL
+	_BSD
+	_BTN
+	_BWP
+	_BYN
+	_BZD
+	_CAD
+	_CDF
+	_CHE
+	_CHF
+	_CHW
+	_CLF
+	_CLP
+	_CNY
+	_COP
+	_COU
+	_CRC
+	_CUP
+	_CVE
+	_CZK
+	_DJF
+	_DKK
+	_DOP
+	_DZD
+	_EGP
+	_ERN
+	_ETB
+	_EUR
+	_FJD
+	_FKP
+	_GBP
+	_GEL
+	_GHS
+	_GIP
+	_GMD
+	_GNF
+	_GTQ
+	_GYD
+	_HKD
+	_HNL
+	_HRD
+	_HRK
+	_HTG
+	_HUF
+	_IDR
+	_ILS
+	_INR
+	_IQD
+	_IRR
+	_ISK
+	_JMD
+	_JOD
+	_JPY
+	_KES
+	_KGS
+	_KHR
+	_KMF
+	_KPW
+	_KRW
+	_KWD
+	_KYD
+	_KZT
+	_LAK
+	_LBP
+	_LKR
+	_LRD
+	_LSL
+	_LYD
+	_MAD
+	_MDL
+	_MGA
+	_MKD
+	_MMK
+	_MNT
+	_MOP
+	_MRU
+	_MUR
+	_MVR
+	_MWK
+	_MXN
+	_MXV
+	_MYR
+	_MZN
+	_NAD
+	_NGN
+	_NIO
+	_NOK
+	_NPR
+	_NZD
+	_OMR
+	_PAB
+	_PEN
+	_PGK
+	_PHP
+	_PKR
+	_PLN
+	_PYG
+	_QAR
+	_RON
+	_RSD
+	_RUB
+	_RWF
+	_SAR
+	_SBD
+	_SCR
+	_SDG
+	_SEK
+	_SGD
+	_SHP
+	_SLE
+	_SLL
+	_SOS
+	_SRD
+	_SSP
+	_STN
+	_SVC
+	_SYP
+	_SZL
+	_THB
+	_TJS
+	_TMT
+	_TND
+	_TOP
+	_TRY
+	_TTD
+	_TWD
+	_TZS
+	_UAH
+	_UGX
+	_USD
+	_USN
+	_UYI
+	_UYU
+	_UYW
+	_UZS
+	_VED
+	_VES
+	_VND
+	_VUV
+	_WST
+	_XAF
+	_XAG
+	_XAU
+	_XBA
+	_XBB
+	_XBC
+	_XBD
+	_XCD
+	_XDR
+	_XOF
+	_XPD
+	_XPF
+	_XPT
+	_XSU
+	_XTS
+	_XUA
+	_XXX
+	_YER
+	_ZAR
+	_ZMW
+	_ZWL
 )
 
-var currencies = [...]struct {
+var (
+	AED = Currency{_AED}
+	AFN = Currency{_AFN}
+	ALL = Currency{_ALL}
+	AMD = Currency{_AMD}
+	ANG = Currency{_ANG}
+	AOA = Currency{_AOA}
+	ARS = Currency{_ARS}
+	AUD = Currency{_AUD}
+	AWG = Currency{_AWG}
+	AZN = Currency{_AZN}
+	BAM = Currency{_BAM}
+	BBD = Currency{_BBD}
+	BDT = Currency{_BDT}
+	BGN = Currency{_BGN}
+	BHD = Currency{_BHD}
+	BIF = Currency{_BIF}
+	BMD = Currency{_BMD}
+	BND = Currency{_BND}
+	BOB = Currency{_BOB}
+	BOV = Currency{_BOV}
+	BRL = Currency{_BRL}
+	BSD = Currency{_BSD}
+	BTN = Currency{_BTN}
+	BWP = Currency{_BWP}
+	BYN = Currency{_BYN}
+	BZD = Currency{_BZD}
+	CAD = Currency{_CAD}
+	CDF = Currency{_CDF}
+	CHE = Currency{_CHE}
+	CHF = Currency{_CHF}
+	CHW = Currency{_CHW}
+	CLF = Currency{_CLF}
+	CLP = Currency{_CLP}
+	CNY = Currency{_CNY}
+	COP = Currency{_COP}
+	COU = Currency{_COU}
+	CRC = Currency{_CRC}
+	CUP = Currency{_CUP}
+	CVE = Currency{_CVE}
+	CZK = Currency{_CZK}
+	DJF = Currency{_DJF}
+	DKK = Currency{_DKK}
+	DOP = Currency{_DOP}
+	DZD = Currency{_DZD}
+	EGP = Currency{_EGP}
+	ERN = Currency{_ERN}
+	ETB = Currency{_ETB}
+	EUR = Currency{_EUR}
+	FJD = Currency{_FJD}
+	FKP = Currency{_FKP}
+	GBP = Currency{_GBP}
+	GEL = Currency{_GEL}
+	GHS = Currency{_GHS}
+	GIP = Currency{_GIP}
+	GMD = Currency{_GMD}
+	GNF = Currency{_GNF}
+	GTQ = Currency{_GTQ}
+	GYD = Currency{_GYD}
+	HKD = Currency{_HKD}
+	HNL = Currency{_HNL}
+	HRD = Currency{_HRD}
+	HRK = Currency{_HRK}
+	HTG = Currency{_HTG}
+	HUF = Currency{_HUF}
+	IDR = Currency{_IDR}
+	ILS = Currency{_ILS}
+	INR = Currency{_INR}
+	IQD = Currency{_IQD}
+	IRR = Currency{_IRR}
+	ISK = Currency{_ISK}
+	JMD = Currency{_JMD}
+	JOD = Currency{_JOD}
+	JPY = Currency{_JPY}
+	KES = Currency{_KES}
+	KGS = Currency{_KGS}
+	KHR = Currency{_KHR}
+	KMF = Currency{_KMF}
+	KPW = Currency{_KPW}
+	KRW = Currency{_KRW}
+	KWD = Currency{_KWD}
+	KYD = Currency{_KYD}
+	KZT = Currency{_KZT}
+	LAK = Currency{_LAK}
+	LBP = Currency{_LBP}
+	LKR = Currency{_LKR}
+	LRD = Currency{_LRD}
+	LSL = Currency{_LSL}
+	LYD = Currency{_LYD}
+	MAD = Currency{_MAD}
+	MDL = Currency{_MDL}
+	MGA = Currency{_MGA}
+	MKD = Currency{_MKD}
+	MMK = Currency{_MMK}
+	MNT = Currency{_MNT}
+	MOP = Currency{_MOP}
+	MRU = Currency{_MRU}
+	MUR = Currency{_MUR}
+	MVR = Currency{_MVR}
+	MWK = Currency{_MWK}
+	MXN = Currency{_MXN}
+	MXV = Currency{_MXV}
+	MYR = Currency{_MYR}
+	MZN = Currency{_MZN}
+	NAD = Currency{_NAD}
+	NGN = Currency{_NGN}
+	NIO = Currency{_NIO}
+	NOK = Currency{_NOK}
+	NPR = Currency{_NPR}
+	NZD = Currency{_NZD}
+	OMR = Currency{_OMR}
+	PAB = Currency{_PAB}
+	PEN = Currency{_PEN}
+	PGK = Currency{_PGK}
+	PHP = Currency{_PHP}
+	PKR = Currency{_PKR}
+	PLN = Currency{_PLN}
+	PYG = Currency{_PYG}
+	QAR = Currency{_QAR}
+	RON = Currency{_RON}
+	RSD = Currency{_RSD}
+	RUB = Currency{_RUB}
+	RWF = Currency{_RWF}
+	SAR = Currency{_SAR}
+	SBD = Currency{_SBD}
+	SCR = Currency{_SCR}
+	SDG = Currency{_SDG}
+	SEK = Currency{_SEK}
+	SGD = Currency{_SGD}
+	SHP = Currency{_SHP}
+	SLE = Currency{_SLE}
+	SLL = Currency{_SLL}
+	SOS = Currency{_SOS}
+	SRD = Currency{_SRD}
+	SSP = Currency{_SSP}
+	STN = Currency{_STN}
+	SVC = Currency{_SVC}
+	SYP = Currency{_SYP}
+	SZL = Currency{_SZL}
+	THB = Currency{_THB}
+	TJS = Currency{_TJS}
+	TMT = Currency{_TMT}
+	TND = Currency{_TND}
+	TOP = Currency{_TOP}
+	TRY = Currency{_TRY}
+	TTD = Currency{_TTD}
+	TWD = Currency{_TWD}
+	TZS = Currency{_TZS}
+	UAH = Currency{_UAH}
+	UGX = Currency{_UGX}
+	USD = Currency{_USD}
+	USN = Currency{_USN}
+	UYI = Currency{_UYI}
+	UYU = Currency{_UYU}
+	UYW = Currency{_UYW}
+	UZS = Currency{_UZS}
+	VED = Currency{_VED}
+	VES = Currency{_VES}
+	VND = Currency{_VND}
+	VUV = Currency{_VUV}
+	WST = Currency{_WST}
+	XAF = Currency{_XAF}
+	XAG = Currency{_XAG}
+	XAU = Currency{_XAU}
+	XBA = Currency{_XBA}
+	XBB = Currency{_XBB}
+	XBC = Currency{_XBC}
+	XBD = Currency{_XBD}
+	XCD = Currency{_XCD}
+	XDR = Currency{_XDR}
+	XOF = Currency{_XOF}
+	XPD = Currency{_XPD}
+	XPF = Currency{_XPF}
+	XPT = Currency{_XPT}
+	XSU = Currency{_XSU}
+	XTS = Currency{_XTS}
+	XUA = Currency{_XUA}
+	XXX = Currency{_XXX}
+	YER = Currency{_YER}
+	ZAR = Currency{_ZAR}
+	ZMW = Currency{_ZMW}
+	ZWL = Currency{_ZWL}
+)
+
+var currencies = map[Currency]struct {
 	alpha    string
 	exponent int
 }{
