@@ -231,3 +231,7 @@ It is possible to rely on Go compiler to strictiy currency enum by wrapping into
 There is no performance penalty.
 Implementation is almost same.
 API is the same, but much safer.
+
+## Appendix E: Quotes
+
+> _Be Precise. Using floats to represent currency is almost criminal. — Robert.C.Martin, "Clean Code" p.301_
