@@ -5,6 +5,8 @@
 [![Go Reference](https://pkg.go.dev/badge/github.com/nikolaydubina/fpmoney.svg)](https://pkg.go.dev/github.com/nikolaydubina/fpmoney)
 [![Mentioned in Awesome Go](https://awesome.re/mentioned-badge.svg)](https://github.com/avelino/awesome-go)
 
+> _**Be Precise:** using floats to represent currency is almost criminal. — Robert.C.Martin, "Clean Code" p.301_
+
 * as fast as `int64`
 * no `float` in parsing nor printing
 * `ISO 4217` currency
@@ -231,7 +233,3 @@ It is possible to rely on Go compiler to strictiy currency enum by wrapping into
 There is no performance penalty.
 Implementation is almost same.
 API is the same, but much safer.
-
-## Appendix E: Quotes
-
-> _Be Precise. Using floats to represent currency is almost criminal. — Robert.C.Martin, "Clean Code" p.301_
