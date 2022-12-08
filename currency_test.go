@@ -5,9 +5,11 @@ import (
 	"testing"
 )
 
+const numCurrencies = 181
+
 func TestCurrency(t *testing.T) {
-	if len(currencies) != (numCurrencies - 2) {
-		t.Errorf("wrong number of currencies(%d) exp(%d)", len(currencies), numCurrencies-2)
+	if len(currencies) != numCurrencies {
+		t.Errorf("wrong number of currencies(%d) exp(%d)", len(currencies), numCurrencies)
 	}
 	if len(fromAlpha) != numCurrencies {
 		t.Errorf("wrong number of currencies(%d) exp(%d)", len(fromAlpha), numCurrencies)
