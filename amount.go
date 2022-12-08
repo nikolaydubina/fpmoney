@@ -115,7 +115,7 @@ func (a *Amount) UnmarshalJSON(b []byte) (err error) {
 			for ; i < len(b) && b[i] != '"'; i++ {
 			}
 			if i == len(b) {
-				return errors.New("wrong currency: " + "missing json value")
+				return errors.New("wrong currency: missing json value")
 			}
 			i++ // opening `"`
 			e = i + lenISO427Currency
@@ -145,7 +145,7 @@ func (a *Amount) UnmarshalJSON(b []byte) (err error) {
 	}
 
 	if (a.c == Currency{}) {
-		return errors.New("wrong currency: " + "not recognized")
+		return errors.New("wrong currency: not recognized")
 	}
 
 	a.v, err = fpdecimal.ParseFixedPointDecimal(string(b[as:ae]), int8(a.c.Exponent()))
