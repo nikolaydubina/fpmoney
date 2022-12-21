@@ -67,14 +67,7 @@ fmt.Println(y == x.Mul(3))
 
 ### Cross Currency Protection
 
-Akin to integer division by 0, which panics in Go, arithmetic operations on differnet currenices result in panic.
-Returning error in arithmetic operation would prohibit chaning of method calls, which is not convenient.
-It is better to stop execution, rather then corrupt value.
-Mismatched or missing currencies must be caught at testing or QA of your code.
-
-Two mechanisms to reduce panics are planned for future versions:
-1. package level var for enable/disable currency check
-2. package level var for fallback currency
+Akin to integer division by 0 which panics in Go, mismatched currenices result in panic.
 
 Arithmetics
 ```go
