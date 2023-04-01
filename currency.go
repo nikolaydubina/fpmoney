@@ -1,7 +1,5 @@
 package fpmoney
 
-import "errors"
-
 // Currency is ISO 4217 without deprecated currencies.
 // Zero value is undefined currency.
 type Currency struct{ v uint8 }
@@ -14,10 +12,12 @@ func (c Currency) Exponent() int { return currencies[c].exponent }
 
 func (c Currency) String() string { return c.Alpha() }
 
+func (c Currency) IsUndefined() bool { return c.v == 0 }
+
 func (c *Currency) UnmarshalText(text []byte) error {
 	v, ok := fromAlpha[string(text)]
 	if !ok {
-		return errors.New("wrong text: " + string(text))
+		return &ErrWrongCurrencyString{}
 	}
 	*c = v
 	return nil
@@ -31,7 +31,7 @@ func CurrencyFromAlpha(alpha string) (Currency, error) {
 	if c, ok := fromAlpha[alpha]; ok {
 		return c, nil
 	}
-	return Currency{}, errors.New("no currency exists with alphabetic code " + alpha)
+	return Currency{}, &ErrWrongCurrencyString{}
 }
 
 func (c Currency) scale() int64 {

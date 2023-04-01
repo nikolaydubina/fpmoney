@@ -623,54 +623,54 @@ func TestArithmetic_WrongCurrency(t *testing.T) {
 		a fpmoney.Amount
 		b fpmoney.Amount
 		f func(a, b fpmoney.Amount)
-		e error
+		e *fpmoney.ErrCurrencyMismatch
 	}{
 		{
 			a: fpmoney.FromInt(10, fpmoney.SGD),
 			b: fpmoney.FromInt(11, fpmoney.USD),
 			f: func(a, b fpmoney.Amount) { a.Add(b) },
-			e: fpmoney.NewErrCurrencyMismatch(fpmoney.SGD, fpmoney.USD),
+			e: &fpmoney.ErrCurrencyMismatch{A: fpmoney.SGD, B: fpmoney.USD},
 		},
 		{
 			a: fpmoney.FromInt(10, fpmoney.SGD),
 			b: fpmoney.FromInt(11, fpmoney.USD),
 			f: func(a, b fpmoney.Amount) { a.Sub(b) },
-			e: fpmoney.NewErrCurrencyMismatch(fpmoney.SGD, fpmoney.USD),
+			e: &fpmoney.ErrCurrencyMismatch{A: fpmoney.SGD, B: fpmoney.USD},
 		},
 		{
 			a: fpmoney.FromInt(10, fpmoney.SGD),
 			b: fpmoney.FromInt(11, fpmoney.USD),
 			f: func(a, b fpmoney.Amount) { a.LessThan(b) },
-			e: fpmoney.NewErrCurrencyMismatch(fpmoney.SGD, fpmoney.USD),
+			e: &fpmoney.ErrCurrencyMismatch{A: fpmoney.SGD, B: fpmoney.USD},
 		},
 		{
 			a: fpmoney.FromInt(10, fpmoney.SGD),
 			b: fpmoney.FromInt(11, fpmoney.USD),
 			f: func(a, b fpmoney.Amount) { a.LessThanOrEqual(b) },
-			e: fpmoney.NewErrCurrencyMismatch(fpmoney.SGD, fpmoney.USD),
+			e: &fpmoney.ErrCurrencyMismatch{A: fpmoney.SGD, B: fpmoney.USD},
 		},
 		{
 			a: fpmoney.FromInt(10, fpmoney.SGD),
 			b: fpmoney.FromInt(11, fpmoney.USD),
 			f: func(a, b fpmoney.Amount) { a.GreaterThan(b) },
-			e: fpmoney.NewErrCurrencyMismatch(fpmoney.SGD, fpmoney.USD),
+			e: &fpmoney.ErrCurrencyMismatch{A: fpmoney.SGD, B: fpmoney.USD},
 		},
 		{
 			a: fpmoney.FromInt(10, fpmoney.SGD),
 			b: fpmoney.FromInt(11, fpmoney.USD),
 			f: func(a, b fpmoney.Amount) { a.GreaterThanOrEqual(b) },
-			e: fpmoney.NewErrCurrencyMismatch(fpmoney.SGD, fpmoney.USD),
+			e: &fpmoney.ErrCurrencyMismatch{A: fpmoney.SGD, B: fpmoney.USD},
 		},
 	}
-	for _, tc := range tests {
-		t.Run(fmt.Sprintf("%#v", tc), func(t *testing.T) {
+	for i, tc := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			defer func() {
 				r := recover()
 				re, ok := r.(error)
 				if !ok {
 					t.Error(r)
 				}
-				if !errors.Is(re, tc.e) {
+				if err := fpmoney.NewErrCurrencyMismatch(); !errors.As(re, &err) || *err != *tc.e {
 					t.Error(re, tc.e)
 				}
 			}()
@@ -680,15 +680,8 @@ func TestArithmetic_WrongCurrency(t *testing.T) {
 }
 
 func TestErrCurrencyMismatch_Error(t *testing.T) {
-	t.Run("nil", func(t *testing.T) {
-		var e *fpmoney.ErrCurrencyMismatch
-		if e.Error() != "" {
-			t.Error(e)
-		}
-	})
-
 	t.Run("error", func(t *testing.T) {
-		e := fpmoney.NewErrCurrencyMismatch(fpmoney.SGD, fpmoney.USD)
+		e := &fpmoney.ErrCurrencyMismatch{A: fpmoney.SGD, B: fpmoney.USD}
 		if e.Error() != "SGD != USD" {
 			t.Error(e)
 		}
