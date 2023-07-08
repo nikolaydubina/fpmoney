@@ -159,6 +159,10 @@ JSONMarshal/small-10         2.00 ± 0%      2.00 ± 0%      3.00 ± 0%
 JSONMarshal/large-10         2.00 ± 0%      2.00 ± 0%      3.00 ± 0%
 ```
 
+## References
+
+- [ferdypruis/iso4217](https://github.com/ferdypruis/iso4217) was a good inspiration and reference material. it was used in early version as well. it is well maintained and fast library for currencies. 
+
 ## Appendix A: `json.Unmarshal` optimizations
 
 Parsing is surprisingly slow. It is ~6x of `float32` + `string`.
