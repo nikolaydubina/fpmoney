@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="logo.png" width="300" height="300">
+</p>
+
 ## 🧧 Fixed-Point Decimal Money
 
 [![codecov](https://codecov.io/gh/nikolaydubina/fpmoney/branch/master/graph/badge.svg?token=Eh52jhLERp)](https://codecov.io/gh/nikolaydubina/fpmoney)
