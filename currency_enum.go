@@ -2,371 +2,371 @@ package fpmoney
 
 const (
 	_ uint8 = iota
-	_AED
-	_AFN
-	_ALL
-	_AMD
-	_ANG
-	_AOA
-	_ARS
-	_AUD
-	_AWG
-	_AZN
-	_BAM
-	_BBD
-	_BDT
-	_BGN
-	_BHD
-	_BIF
-	_BMD
-	_BND
-	_BOB
-	_BOV
-	_BRL
-	_BSD
-	_BTN
-	_BWP
-	_BYN
-	_BZD
-	_CAD
-	_CDF
-	_CHE
-	_CHF
-	_CHW
-	_CLF
-	_CLP
-	_CNY
-	_COP
-	_COU
-	_CRC
-	_CUP
-	_CVE
-	_CZK
-	_DJF
-	_DKK
-	_DOP
-	_DZD
-	_EGP
-	_ERN
-	_ETB
-	_EUR
-	_FJD
-	_FKP
-	_GBP
-	_GEL
-	_GHS
-	_GIP
-	_GMD
-	_GNF
-	_GTQ
-	_GYD
-	_HKD
-	_HNL
-	_HRD
-	_HRK
-	_HTG
-	_HUF
-	_IDR
-	_ILS
-	_INR
-	_IQD
-	_IRR
-	_ISK
-	_JMD
-	_JOD
-	_JPY
-	_KES
-	_KGS
-	_KHR
-	_KMF
-	_KPW
-	_KRW
-	_KWD
-	_KYD
-	_KZT
-	_LAK
-	_LBP
-	_LKR
-	_LRD
-	_LSL
-	_LYD
-	_MAD
-	_MDL
-	_MGA
-	_MKD
-	_MMK
-	_MNT
-	_MOP
-	_MRU
-	_MUR
-	_MVR
-	_MWK
-	_MXN
-	_MXV
-	_MYR
-	_MZN
-	_NAD
-	_NGN
-	_NIO
-	_NOK
-	_NPR
-	_NZD
-	_OMR
-	_PAB
-	_PEN
-	_PGK
-	_PHP
-	_PKR
-	_PLN
-	_PYG
-	_QAR
-	_RON
-	_RSD
-	_RUB
-	_RWF
-	_SAR
-	_SBD
-	_SCR
-	_SDG
-	_SEK
-	_SGD
-	_SHP
-	_SLE
-	_SLL
-	_SOS
-	_SRD
-	_SSP
-	_STN
-	_SVC
-	_SYP
-	_SZL
-	_THB
-	_TJS
-	_TMT
-	_TND
-	_TOP
-	_TRY
-	_TTD
-	_TWD
-	_TZS
-	_UAH
-	_UGX
-	_USD
-	_USN
-	_UYI
-	_UYU
-	_UYW
-	_UZS
-	_VED
-	_VES
-	_VND
-	_VUV
-	_WST
-	_XAF
-	_XAG
-	_XAU
-	_XBA
-	_XBB
-	_XBC
-	_XBD
-	_XCD
-	_XDR
-	_XOF
-	_XPD
-	_XPF
-	_XPT
-	_XSU
-	_XTS
-	_XUA
-	_XXX
-	_YER
-	_ZAR
-	_ZMW
-	_ZWL
+	iAED
+	iAFN
+	iALL
+	iAMD
+	iANG
+	iAOA
+	iARS
+	iAUD
+	iAWG
+	iAZN
+	iBAM
+	iBBD
+	iBDT
+	iBGN
+	iBHD
+	iBIF
+	iBMD
+	iBND
+	iBOB
+	iBOV
+	iBRL
+	iBSD
+	iBTN
+	iBWP
+	iBYN
+	iBZD
+	iCAD
+	iCDF
+	iCHE
+	iCHF
+	iCHW
+	iCLF
+	iCLP
+	iCNY
+	iCOP
+	iCOU
+	iCRC
+	iCUP
+	iCVE
+	iCZK
+	iDJF
+	iDKK
+	iDOP
+	iDZD
+	iEGP
+	iERN
+	iETB
+	iEUR
+	iFJD
+	iFKP
+	iGBP
+	iGEL
+	iGHS
+	iGIP
+	iGMD
+	iGNF
+	iGTQ
+	iGYD
+	iHKD
+	iHNL
+	iHRD
+	iHRK
+	iHTG
+	iHUF
+	iIDR
+	iILS
+	iINR
+	iIQD
+	iIRR
+	iISK
+	iJMD
+	iJOD
+	iJPY
+	iKES
+	iKGS
+	iKHR
+	iKMF
+	iKPW
+	iKRW
+	iKWD
+	iKYD
+	iKZT
+	iLAK
+	iLBP
+	iLKR
+	iLRD
+	iLSL
+	iLYD
+	iMAD
+	iMDL
+	iMGA
+	iMKD
+	iMMK
+	iMNT
+	iMOP
+	iMRU
+	iMUR
+	iMVR
+	iMWK
+	iMXN
+	iMXV
+	iMYR
+	iMZN
+	iNAD
+	iNGN
+	iNIO
+	iNOK
+	iNPR
+	iNZD
+	iOMR
+	iPAB
+	iPEN
+	iPGK
+	iPHP
+	iPKR
+	iPLN
+	iPYG
+	iQAR
+	iRON
+	iRSD
+	iRUB
+	iRWF
+	iSAR
+	iSBD
+	iSCR
+	iSDG
+	iSEK
+	iSGD
+	iSHP
+	iSLE
+	iSLL
+	iSOS
+	iSRD
+	iSSP
+	iSTN
+	iSVC
+	iSYP
+	iSZL
+	iTHB
+	iTJS
+	iTMT
+	iTND
+	iTOP
+	iTRY
+	iTTD
+	iTWD
+	iTZS
+	iUAH
+	iUGX
+	iUSD
+	iUSN
+	iUYI
+	iUYU
+	iUYW
+	iUZS
+	iVED
+	iVES
+	iVND
+	iVUV
+	iWST
+	iXAF
+	iXAG
+	iXAU
+	iXBA
+	iXBB
+	iXBC
+	iXBD
+	iXCD
+	iXDR
+	iXOF
+	iXPD
+	iXPF
+	iXPT
+	iXSU
+	iXTS
+	iXUA
+	iXXX
+	iYER
+	iZAR
+	iZMW
+	iZWL
 )
 
 var (
-	AED = Currency{_AED}
-	AFN = Currency{_AFN}
-	ALL = Currency{_ALL}
-	AMD = Currency{_AMD}
-	ANG = Currency{_ANG}
-	AOA = Currency{_AOA}
-	ARS = Currency{_ARS}
-	AUD = Currency{_AUD}
-	AWG = Currency{_AWG}
-	AZN = Currency{_AZN}
-	BAM = Currency{_BAM}
-	BBD = Currency{_BBD}
-	BDT = Currency{_BDT}
-	BGN = Currency{_BGN}
-	BHD = Currency{_BHD}
-	BIF = Currency{_BIF}
-	BMD = Currency{_BMD}
-	BND = Currency{_BND}
-	BOB = Currency{_BOB}
-	BOV = Currency{_BOV}
-	BRL = Currency{_BRL}
-	BSD = Currency{_BSD}
-	BTN = Currency{_BTN}
-	BWP = Currency{_BWP}
-	BYN = Currency{_BYN}
-	BZD = Currency{_BZD}
-	CAD = Currency{_CAD}
-	CDF = Currency{_CDF}
-	CHE = Currency{_CHE}
-	CHF = Currency{_CHF}
-	CHW = Currency{_CHW}
-	CLF = Currency{_CLF}
-	CLP = Currency{_CLP}
-	CNY = Currency{_CNY}
-	COP = Currency{_COP}
-	COU = Currency{_COU}
-	CRC = Currency{_CRC}
-	CUP = Currency{_CUP}
-	CVE = Currency{_CVE}
-	CZK = Currency{_CZK}
-	DJF = Currency{_DJF}
-	DKK = Currency{_DKK}
-	DOP = Currency{_DOP}
-	DZD = Currency{_DZD}
-	EGP = Currency{_EGP}
-	ERN = Currency{_ERN}
-	ETB = Currency{_ETB}
-	EUR = Currency{_EUR}
-	FJD = Currency{_FJD}
-	FKP = Currency{_FKP}
-	GBP = Currency{_GBP}
-	GEL = Currency{_GEL}
-	GHS = Currency{_GHS}
-	GIP = Currency{_GIP}
-	GMD = Currency{_GMD}
-	GNF = Currency{_GNF}
-	GTQ = Currency{_GTQ}
-	GYD = Currency{_GYD}
-	HKD = Currency{_HKD}
-	HNL = Currency{_HNL}
-	HRD = Currency{_HRD}
-	HRK = Currency{_HRK}
-	HTG = Currency{_HTG}
-	HUF = Currency{_HUF}
-	IDR = Currency{_IDR}
-	ILS = Currency{_ILS}
-	INR = Currency{_INR}
-	IQD = Currency{_IQD}
-	IRR = Currency{_IRR}
-	ISK = Currency{_ISK}
-	JMD = Currency{_JMD}
-	JOD = Currency{_JOD}
-	JPY = Currency{_JPY}
-	KES = Currency{_KES}
-	KGS = Currency{_KGS}
-	KHR = Currency{_KHR}
-	KMF = Currency{_KMF}
-	KPW = Currency{_KPW}
-	KRW = Currency{_KRW}
-	KWD = Currency{_KWD}
-	KYD = Currency{_KYD}
-	KZT = Currency{_KZT}
-	LAK = Currency{_LAK}
-	LBP = Currency{_LBP}
-	LKR = Currency{_LKR}
-	LRD = Currency{_LRD}
-	LSL = Currency{_LSL}
-	LYD = Currency{_LYD}
-	MAD = Currency{_MAD}
-	MDL = Currency{_MDL}
-	MGA = Currency{_MGA}
-	MKD = Currency{_MKD}
-	MMK = Currency{_MMK}
-	MNT = Currency{_MNT}
-	MOP = Currency{_MOP}
-	MRU = Currency{_MRU}
-	MUR = Currency{_MUR}
-	MVR = Currency{_MVR}
-	MWK = Currency{_MWK}
-	MXN = Currency{_MXN}
-	MXV = Currency{_MXV}
-	MYR = Currency{_MYR}
-	MZN = Currency{_MZN}
-	NAD = Currency{_NAD}
-	NGN = Currency{_NGN}
-	NIO = Currency{_NIO}
-	NOK = Currency{_NOK}
-	NPR = Currency{_NPR}
-	NZD = Currency{_NZD}
-	OMR = Currency{_OMR}
-	PAB = Currency{_PAB}
-	PEN = Currency{_PEN}
-	PGK = Currency{_PGK}
-	PHP = Currency{_PHP}
-	PKR = Currency{_PKR}
-	PLN = Currency{_PLN}
-	PYG = Currency{_PYG}
-	QAR = Currency{_QAR}
-	RON = Currency{_RON}
-	RSD = Currency{_RSD}
-	RUB = Currency{_RUB}
-	RWF = Currency{_RWF}
-	SAR = Currency{_SAR}
-	SBD = Currency{_SBD}
-	SCR = Currency{_SCR}
-	SDG = Currency{_SDG}
-	SEK = Currency{_SEK}
-	SGD = Currency{_SGD}
-	SHP = Currency{_SHP}
-	SLE = Currency{_SLE}
-	SLL = Currency{_SLL}
-	SOS = Currency{_SOS}
-	SRD = Currency{_SRD}
-	SSP = Currency{_SSP}
-	STN = Currency{_STN}
-	SVC = Currency{_SVC}
-	SYP = Currency{_SYP}
-	SZL = Currency{_SZL}
-	THB = Currency{_THB}
-	TJS = Currency{_TJS}
-	TMT = Currency{_TMT}
-	TND = Currency{_TND}
-	TOP = Currency{_TOP}
-	TRY = Currency{_TRY}
-	TTD = Currency{_TTD}
-	TWD = Currency{_TWD}
-	TZS = Currency{_TZS}
-	UAH = Currency{_UAH}
-	UGX = Currency{_UGX}
-	USD = Currency{_USD}
-	USN = Currency{_USN}
-	UYI = Currency{_UYI}
-	UYU = Currency{_UYU}
-	UYW = Currency{_UYW}
-	UZS = Currency{_UZS}
-	VED = Currency{_VED}
-	VES = Currency{_VES}
-	VND = Currency{_VND}
-	VUV = Currency{_VUV}
-	WST = Currency{_WST}
-	XAF = Currency{_XAF}
-	XAG = Currency{_XAG}
-	XAU = Currency{_XAU}
-	XBA = Currency{_XBA}
-	XBB = Currency{_XBB}
-	XBC = Currency{_XBC}
-	XBD = Currency{_XBD}
-	XCD = Currency{_XCD}
-	XDR = Currency{_XDR}
-	XOF = Currency{_XOF}
-	XPD = Currency{_XPD}
-	XPF = Currency{_XPF}
-	XPT = Currency{_XPT}
-	XSU = Currency{_XSU}
-	XTS = Currency{_XTS}
-	XUA = Currency{_XUA}
-	XXX = Currency{_XXX}
-	YER = Currency{_YER}
-	ZAR = Currency{_ZAR}
-	ZMW = Currency{_ZMW}
-	ZWL = Currency{_ZWL}
+	AED = Currency{iAED}
+	AFN = Currency{iAFN}
+	ALL = Currency{iALL}
+	AMD = Currency{iAMD}
+	ANG = Currency{iANG}
+	AOA = Currency{iAOA}
+	ARS = Currency{iARS}
+	AUD = Currency{iAUD}
+	AWG = Currency{iAWG}
+	AZN = Currency{iAZN}
+	BAM = Currency{iBAM}
+	BBD = Currency{iBBD}
+	BDT = Currency{iBDT}
+	BGN = Currency{iBGN}
+	BHD = Currency{iBHD}
+	BIF = Currency{iBIF}
+	BMD = Currency{iBMD}
+	BND = Currency{iBND}
+	BOB = Currency{iBOB}
+	BOV = Currency{iBOV}
+	BRL = Currency{iBRL}
+	BSD = Currency{iBSD}
+	BTN = Currency{iBTN}
+	BWP = Currency{iBWP}
+	BYN = Currency{iBYN}
+	BZD = Currency{iBZD}
+	CAD = Currency{iCAD}
+	CDF = Currency{iCDF}
+	CHE = Currency{iCHE}
+	CHF = Currency{iCHF}
+	CHW = Currency{iCHW}
+	CLF = Currency{iCLF}
+	CLP = Currency{iCLP}
+	CNY = Currency{iCNY}
+	COP = Currency{iCOP}
+	COU = Currency{iCOU}
+	CRC = Currency{iCRC}
+	CUP = Currency{iCUP}
+	CVE = Currency{iCVE}
+	CZK = Currency{iCZK}
+	DJF = Currency{iDJF}
+	DKK = Currency{iDKK}
+	DOP = Currency{iDOP}
+	DZD = Currency{iDZD}
+	EGP = Currency{iEGP}
+	ERN = Currency{iERN}
+	ETB = Currency{iETB}
+	EUR = Currency{iEUR}
+	FJD = Currency{iFJD}
+	FKP = Currency{iFKP}
+	GBP = Currency{iGBP}
+	GEL = Currency{iGEL}
+	GHS = Currency{iGHS}
+	GIP = Currency{iGIP}
+	GMD = Currency{iGMD}
+	GNF = Currency{iGNF}
+	GTQ = Currency{iGTQ}
+	GYD = Currency{iGYD}
+	HKD = Currency{iHKD}
+	HNL = Currency{iHNL}
+	HRD = Currency{iHRD}
+	HRK = Currency{iHRK}
+	HTG = Currency{iHTG}
+	HUF = Currency{iHUF}
+	IDR = Currency{iIDR}
+	ILS = Currency{iILS}
+	INR = Currency{iINR}
+	IQD = Currency{iIQD}
+	IRR = Currency{iIRR}
+	ISK = Currency{iISK}
+	JMD = Currency{iJMD}
+	JOD = Currency{iJOD}
+	JPY = Currency{iJPY}
+	KES = Currency{iKES}
+	KGS = Currency{iKGS}
+	KHR = Currency{iKHR}
+	KMF = Currency{iKMF}
+	KPW = Currency{iKPW}
+	KRW = Currency{iKRW}
+	KWD = Currency{iKWD}
+	KYD = Currency{iKYD}
+	KZT = Currency{iKZT}
+	LAK = Currency{iLAK}
+	LBP = Currency{iLBP}
+	LKR = Currency{iLKR}
+	LRD = Currency{iLRD}
+	LSL = Currency{iLSL}
+	LYD = Currency{iLYD}
+	MAD = Currency{iMAD}
+	MDL = Currency{iMDL}
+	MGA = Currency{iMGA}
+	MKD = Currency{iMKD}
+	MMK = Currency{iMMK}
+	MNT = Currency{iMNT}
+	MOP = Currency{iMOP}
+	MRU = Currency{iMRU}
+	MUR = Currency{iMUR}
+	MVR = Currency{iMVR}
+	MWK = Currency{iMWK}
+	MXN = Currency{iMXN}
+	MXV = Currency{iMXV}
+	MYR = Currency{iMYR}
+	MZN = Currency{iMZN}
+	NAD = Currency{iNAD}
+	NGN = Currency{iNGN}
+	NIO = Currency{iNIO}
+	NOK = Currency{iNOK}
+	NPR = Currency{iNPR}
+	NZD = Currency{iNZD}
+	OMR = Currency{iOMR}
+	PAB = Currency{iPAB}
+	PEN = Currency{iPEN}
+	PGK = Currency{iPGK}
+	PHP = Currency{iPHP}
+	PKR = Currency{iPKR}
+	PLN = Currency{iPLN}
+	PYG = Currency{iPYG}
+	QAR = Currency{iQAR}
+	RON = Currency{iRON}
+	RSD = Currency{iRSD}
+	RUB = Currency{iRUB}
+	RWF = Currency{iRWF}
+	SAR = Currency{iSAR}
+	SBD = Currency{iSBD}
+	SCR = Currency{iSCR}
+	SDG = Currency{iSDG}
+	SEK = Currency{iSEK}
+	SGD = Currency{iSGD}
+	SHP = Currency{iSHP}
+	SLE = Currency{iSLE}
+	SLL = Currency{iSLL}
+	SOS = Currency{iSOS}
+	SRD = Currency{iSRD}
+	SSP = Currency{iSSP}
+	STN = Currency{iSTN}
+	SVC = Currency{iSVC}
+	SYP = Currency{iSYP}
+	SZL = Currency{iSZL}
+	THB = Currency{iTHB}
+	TJS = Currency{iTJS}
+	TMT = Currency{iTMT}
+	TND = Currency{iTND}
+	TOP = Currency{iTOP}
+	TRY = Currency{iTRY}
+	TTD = Currency{iTTD}
+	TWD = Currency{iTWD}
+	TZS = Currency{iTZS}
+	UAH = Currency{iUAH}
+	UGX = Currency{iUGX}
+	USD = Currency{iUSD}
+	USN = Currency{iUSN}
+	UYI = Currency{iUYI}
+	UYU = Currency{iUYU}
+	UYW = Currency{iUYW}
+	UZS = Currency{iUZS}
+	VED = Currency{iVED}
+	VES = Currency{iVES}
+	VND = Currency{iVND}
+	VUV = Currency{iVUV}
+	WST = Currency{iWST}
+	XAF = Currency{iXAF}
+	XAG = Currency{iXAG}
+	XAU = Currency{iXAU}
+	XBA = Currency{iXBA}
+	XBB = Currency{iXBB}
+	XBC = Currency{iXBC}
+	XBD = Currency{iXBD}
+	XCD = Currency{iXCD}
+	XDR = Currency{iXDR}
+	XOF = Currency{iXOF}
+	XPD = Currency{iXPD}
+	XPF = Currency{iXPF}
+	XPT = Currency{iXPT}
+	XSU = Currency{iXSU}
+	XTS = Currency{iXTS}
+	XUA = Currency{iXUA}
+	XXX = Currency{iXXX}
+	YER = Currency{iYER}
+	ZAR = Currency{iZAR}
+	ZMW = Currency{iZMW}
+	ZWL = Currency{iZWL}
 )
 
 var currencies = map[Currency]struct {
