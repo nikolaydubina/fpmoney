@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="logo.png" width="300" height="300">
+  <img width="300" height="300" src="https://github.com/nikolaydubina/fpmoney/assets/2933061/022c83e3-8a14-4e8f-b1b7-94ab262fa590">
 </p>
 
 ## 🧧 Fixed-Point Decimal Money
