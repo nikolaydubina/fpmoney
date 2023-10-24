@@ -241,6 +241,8 @@ Using `comparable` generic constraint is attractive option, since it allows to p
 Marshalling and Unamrshalling will be fully delegated to other packages too.
 However, this inccurs penalty for performance.
 Arithmetics is 3x slower, and due to `json` pacakge `mallocs` increase 2x. 
+Using fpdecimal.Decimal directly, also fixes precision for whole binary, meaning other pacakges in binary should be using same number of decimal values in fpdecimal package.
+For large scale systems, it is recommended to not access fpdecimal.Decimal directly, but define wrappers on top of it.
 
 ```go
 type Amount[T comparable] struct {
