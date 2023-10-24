@@ -234,3 +234,17 @@ It is possible to rely on Go compiler to strictiy currency enum by wrapping into
 There is no performance penalty.
 Implementation is almost same.
 API is the same, but much safer.
+
+## Appendix E: comparable generics for currency
+
+Using `comparable` generic constraint is attractive option, since it allows to plug-in any type for currencies, including from other packages.
+Marshalling and Unamrshalling will be fully delegated to other packages too.
+However, this inccurs penalty for performance.
+Arithmetics is 3x slower, and due to `json` pacakge `mallocs` increase 2x. 
+
+```go
+type Amount[T comparable] struct {
+	Amount   fpdecimal.Decimal `json:"amount"`
+	Currency T                 `json:"currency"`
+}
+```
