@@ -4,9 +4,8 @@ import (
 	"github.com/nikolaydubina/fpdecimal"
 )
 
-// Amount stores fixed-precision decimal money.
-// Stores integer number of cents for ISO 4217 currency.
-// Values fit in ~92 quadrillion for 2 decimal currencies.
+// Amount stores fixed-precision decimal money in 3 decimal points fpdecimal value.
+// Values fit in 9 quadrillion.
 // Does not use float in printing nor parsing.
 // Rounds down fractional cents during parsing.
 // Blocking arithmetic operations that result in loss of precision.
