@@ -1,6 +1,8 @@
 package fpmoney
 
 import (
+	"fmt"
+
 	"github.com/nikolaydubina/fpdecimal"
 )
 
@@ -73,3 +75,9 @@ func (a Amount[T]) Div(b int) (part Amount[T], remainder Amount[T]) {
 	r, m := a.V.DivMod(fpdecimal.FromInt(b))
 	return Amount[T]{V: r, C: a.C}, Amount[T]{V: m, C: a.C}
 }
+
+type ErrCurrencyMismatch[T comparable] struct{ A, B T }
+
+func NewErrCurrencyMismatch[T comparable]() *ErrCurrencyMismatch[T] { return &ErrCurrencyMismatch[T]{} }
+
+func (e *ErrCurrencyMismatch[T]) Error() string { return fmt.Sprintf("%v != %v", e.A, e.B) }

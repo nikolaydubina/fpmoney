@@ -202,7 +202,7 @@ func FuzzJSONUnmarshal_Float(f *testing.F) {
 
 		fs := `%.` + strconv.Itoa(int(nf)) + `f`
 		rs := fmt.Sprintf(fs, r)
-		s := fmt.Sprintf(`{"amount": %s, "currency": "%s"}`, rs, currency.Alpha())
+		s := fmt.Sprintf(`{"amount": %s, "currency": "%s"}`, rs, currency.String())
 		if _, err := fmt.Sscanf(rs, "%f", &r); err != nil {
 			t.Error(err)
 		}

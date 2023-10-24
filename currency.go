@@ -1,48 +1,220 @@
 package fpmoney
 
+import (
+	_ "embed"
+	"errors"
+	"fmt"
+)
+
 // Currency is ISO 4217 without deprecated currencies.
 // Zero value is undefined currency.
-type Currency struct{ v uint8 }
+type Currency uint8
 
-// Alpha returns the ISO 4217 three-letter alphabetic code.
-func (c Currency) Alpha() string { return currencies[c].alpha }
-
-// Exponent returns the decimal point location.
-func (c Currency) Exponent() int { return currencies[c].exponent }
-
-func (c Currency) String() string { return c.Alpha() }
-
-func (c Currency) IsUndefined() bool { return c.v == 0 }
+func (c Currency) MarshalText() (text []byte, err error) { return []byte(c.String()), nil }
 
 func (c *Currency) UnmarshalText(text []byte) error {
 	v, ok := fromAlpha[string(text)]
 	if !ok {
-		return &ErrWrongCurrencyString{}
+		return errors.New("unexpected alpha: " + string(text))
 	}
 	*c = v
 	return nil
 }
 
-func (c Currency) MarshalText() (text []byte, err error) { return []byte(currencies[c].alpha), nil }
+var (
+	fromAlpha = make(map[string]Currency)
+)
 
-// CurrencyFromAlpha returns Currency for the three-letter alpha code.
-// Or an error if it does not exist.
-func CurrencyFromAlpha(alpha string) (Currency, error) {
-	if c, ok := fromAlpha[alpha]; ok {
-		return c, nil
+func init() {
+	for i := 0; i < len(_Currency_index); i++ {
+		fromAlpha[Currency(_Currency_index[i]).String()] = Currency(_Currency_index[i])
 	}
-	return Currency{}, &ErrWrongCurrencyString{}
+	fmt.Printf("%#v\n", fromAlpha)
 }
 
-func (c Currency) scale() int64 {
-	switch c.Exponent() {
-	case 4:
-		return 10000
-	case 3:
-		return 1000
-	case 2:
-		return 100
-	default:
-		return 1
-	}
-}
+//go:generate stringer -type=Currency
+
+const (
+	_ Currency = iota
+	AED
+	AFN
+	ALL
+	AMD
+	ANG
+	AOA
+	ARS
+	AUD
+	AWG
+	AZN
+	BAM
+	BBD
+	BDT
+	BGN
+	BHD
+	BIF
+	BMD
+	BND
+	BOB
+	BOV
+	BRL
+	BSD
+	BTN
+	BWP
+	BYN
+	BZD
+	CAD
+	CDF
+	CHE
+	CHF
+	CHW
+	CLF
+	CLP
+	CNY
+	COP
+	COU
+	CRC
+	CUP
+	CVE
+	CZK
+	DJF
+	DKK
+	DOP
+	DZD
+	EGP
+	ERN
+	ETB
+	EUR
+	FJD
+	FKP
+	GBP
+	GEL
+	GHS
+	GIP
+	GMD
+	GNF
+	GTQ
+	GYD
+	HKD
+	HNL
+	HRD
+	HRK
+	HTG
+	HUF
+	IDR
+	ILS
+	INR
+	IQD
+	IRR
+	ISK
+	JMD
+	JOD
+	JPY
+	KES
+	KGS
+	KHR
+	KMF
+	KPW
+	KRW
+	KWD
+	KYD
+	KZT
+	LAK
+	LBP
+	LKR
+	LRD
+	LSL
+	LYD
+	MAD
+	MDL
+	MGA
+	MKD
+	MMK
+	MNT
+	MOP
+	MRU
+	MUR
+	MVR
+	MWK
+	MXN
+	MXV
+	MYR
+	MZN
+	NAD
+	NGN
+	NIO
+	NOK
+	NPR
+	NZD
+	OMR
+	PAB
+	PEN
+	PGK
+	PHP
+	PKR
+	PLN
+	PYG
+	QAR
+	RON
+	RSD
+	RUB
+	RWF
+	SAR
+	SBD
+	SCR
+	SDG
+	SEK
+	SGD
+	SHP
+	SLE
+	SLL
+	SOS
+	SRD
+	SSP
+	STN
+	SVC
+	SYP
+	SZL
+	THB
+	TJS
+	TMT
+	TND
+	TOP
+	TRY
+	TTD
+	TWD
+	TZS
+	UAH
+	UGX
+	USD
+	USN
+	UYI
+	UYU
+	UYW
+	UZS
+	VED
+	VES
+	VND
+	VUV
+	WST
+	XAF
+	XAG
+	XAU
+	XBA
+	XBB
+	XBC
+	XBD
+	XCD
+	XDR
+	XOF
+	XPD
+	XPF
+	XPT
+	XSU
+	XTS
+	XUA
+	XXX
+	YER
+	ZAR
+	ZMW
+	ZWL
+)
