@@ -225,7 +225,7 @@ func FuzzJSONUnmarshal_Float(f *testing.F) {
 			t.Error(rs, currency, err)
 		}
 
-		if x.C != currency {
+		if x.Currency != currency {
 			t.Error(x, currency)
 		}
 	})

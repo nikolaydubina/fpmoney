@@ -10,66 +10,68 @@ import (
 // Does not use float in printing nor parsing.
 // Rounds down fractional cents during parsing.
 // Blocking arithmetic operations that result in loss of precision.
-type Amount[T comparable] struct {
-	V fpdecimal.Decimal `json:"amount"`
-	C T                 `json:"currency"`
+type Amount[C comparable] struct {
+	Amount   fpdecimal.Decimal `json:"amount"`
+	Currency C                 `json:"currency"`
 }
 
 func FromIntScaled[T ~int | ~int8 | ~int16 | ~int32 | ~int64, C comparable](v T, currency C) Amount[C] {
-	return Amount[C]{V: fpdecimal.FromIntScaled(v), C: currency}
+	return Amount[C]{Amount: fpdecimal.FromIntScaled(v), Currency: currency}
 }
 
 func FromInt[T ~int | ~int8 | ~int16 | ~int32 | ~int64, C comparable](v T, currency C) Amount[C] {
-	return Amount[C]{V: fpdecimal.FromInt(v), C: currency}
+	return Amount[C]{Amount: fpdecimal.FromInt(v), Currency: currency}
 }
 
 func FromFloat[T ~float32 | ~float64, C comparable](v T, currency C) Amount[C] {
-	return Amount[C]{V: fpdecimal.FromFloat(v), C: currency}
+	return Amount[C]{Amount: fpdecimal.FromFloat(v), Currency: currency}
 }
 
-func (a Amount[T]) Float32() float32 { return a.V.Float32() }
+func (a Amount[C]) Float32() float32 { return a.Amount.Float32() }
 
-func (a Amount[T]) Float64() float64 { return a.V.Float64() }
+func (a Amount[C]) Float64() float64 { return a.Amount.Float64() }
 
-func (a Amount[T]) Add(b Amount[T]) Amount[T] {
-	checkCurrency(a.C, b.C)
-	return Amount[T]{V: a.V.Add(b.V), C: a.C}
+func (a Amount[C]) Add(b Amount[C]) Amount[C] {
+	checkCurrency(a.Currency, b.Currency)
+	return Amount[C]{Amount: a.Amount.Add(b.Amount), Currency: a.Currency}
 }
 
-func (a Amount[T]) Sub(b Amount[T]) Amount[T] {
-	checkCurrency(a.C, b.C)
-	return Amount[T]{V: a.V.Sub(b.V), C: a.C}
+func (a Amount[C]) Sub(b Amount[C]) Amount[C] {
+	checkCurrency(a.Currency, b.Currency)
+	return Amount[C]{Amount: a.Amount.Sub(b.Amount), Currency: a.Currency}
 }
 
-func (a Amount[T]) GreaterThan(b Amount[T]) bool {
-	checkCurrency(a.C, b.C)
-	return a.V.GreaterThan(b.V)
+func (a Amount[C]) GreaterThan(b Amount[C]) bool {
+	checkCurrency(a.Currency, b.Currency)
+	return a.Amount.GreaterThan(b.Amount)
 }
 
-func (a Amount[T]) LessThan(b Amount[T]) bool {
-	checkCurrency(a.C, b.C)
-	return a.V.LessThan(b.V)
+func (a Amount[C]) LessThan(b Amount[C]) bool {
+	checkCurrency(a.Currency, b.Currency)
+	return a.Amount.LessThan(b.Amount)
 }
 
-func (a Amount[T]) GreaterThanOrEqual(b Amount[T]) bool {
-	checkCurrency(a.C, b.C)
-	return a.V.GreaterThanOrEqual(b.V)
+func (a Amount[C]) GreaterThanOrEqual(b Amount[C]) bool {
+	checkCurrency(a.Currency, b.Currency)
+	return a.Amount.GreaterThanOrEqual(b.Amount)
 }
 
-func (a Amount[T]) LessThanOrEqual(b Amount[T]) bool {
-	checkCurrency(a.C, b.C)
-	return a.V.LessThanOrEqual(b.V)
+func (a Amount[C]) LessThanOrEqual(b Amount[C]) bool {
+	checkCurrency(a.Currency, b.Currency)
+	return a.Amount.LessThanOrEqual(b.Amount)
 }
 
-func checkCurrency[T comparable](a, b T) {
+func checkCurrency[C comparable](a, b C) {
 	if a != b {
 		panic("currency mismatch")
 	}
 }
 
-func (a Amount[T]) Mul(b int) Amount[T] { return Amount[T]{V: a.V.Mul(fpdecimal.FromInt(b)), C: a.C} }
+func (a Amount[C]) Mul(b int) Amount[C] {
+	return Amount[C]{Amount: a.Amount.Mul(fpdecimal.FromInt(b)), Currency: a.Currency}
+}
 
-func (a Amount[T]) Div(b int) (part Amount[T], remainder Amount[T]) {
-	r, m := a.V.DivMod(fpdecimal.FromInt(b))
-	return Amount[T]{V: r, C: a.C}, Amount[T]{V: m, C: a.C}
+func (a Amount[C]) Div(b int) (part, remainder Amount[C]) {
+	r, m := a.Amount.DivMod(fpdecimal.FromInt(b))
+	return Amount[C]{Amount: r, Currency: a.Currency}, Amount[C]{Amount: m, Currency: a.Currency}
 }
