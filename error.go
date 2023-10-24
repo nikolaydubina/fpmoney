@@ -1,12 +1,14 @@
 package fpmoney
 
-type ErrCurrencyMismatch struct {
-	A, B Currency
+import "fmt"
+
+type ErrCurrencyMismatch[T comparable] struct {
+	A, B T
 }
 
-func NewErrCurrencyMismatch() *ErrCurrencyMismatch { return &ErrCurrencyMismatch{} }
+func NewErrCurrencyMismatch[T comparable]() *ErrCurrencyMismatch[T] { return &ErrCurrencyMismatch[T]{} }
 
-func (e *ErrCurrencyMismatch) Error() string { return e.A.Alpha() + " != " + e.B.Alpha() }
+func (e *ErrCurrencyMismatch[T]) Error() string { return fmt.Sprintf("%v != %v", e.A, e.B) }
 
 type ErrWrongCurrencyString struct{}
 
