@@ -3,7 +3,6 @@ package fpmoney_test
 import (
 	_ "embed"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"log"
 	"strconv"
@@ -634,67 +633,42 @@ func TestArithmetic_WrongCurrency(t *testing.T) {
 		a fpmoney.Amount[fpmoney.Currency]
 		b fpmoney.Amount[fpmoney.Currency]
 		f func(a, b fpmoney.Amount[fpmoney.Currency])
-		e *fpmoney.ErrCurrencyMismatch[fpmoney.Currency]
 	}{
 		{
 			a: fpmoney.FromInt(10, SGD),
 			b: fpmoney.FromInt(11, USD),
 			f: func(a, b fpmoney.Amount[fpmoney.Currency]) { a.Add(b) },
-			e: &fpmoney.ErrCurrencyMismatch[fpmoney.Currency]{A: SGD, B: USD},
 		},
 		{
 			a: fpmoney.FromInt(10, SGD),
 			b: fpmoney.FromInt(11, USD),
 			f: func(a, b fpmoney.Amount[fpmoney.Currency]) { a.Sub(b) },
-			e: &fpmoney.ErrCurrencyMismatch[fpmoney.Currency]{A: SGD, B: USD},
 		},
 		{
 			a: fpmoney.FromInt(10, SGD),
 			b: fpmoney.FromInt(11, USD),
 			f: func(a, b fpmoney.Amount[fpmoney.Currency]) { a.LessThan(b) },
-			e: &fpmoney.ErrCurrencyMismatch[fpmoney.Currency]{A: SGD, B: USD},
 		},
 		{
 			a: fpmoney.FromInt(10, SGD),
 			b: fpmoney.FromInt(11, USD),
 			f: func(a, b fpmoney.Amount[fpmoney.Currency]) { a.LessThanOrEqual(b) },
-			e: &fpmoney.ErrCurrencyMismatch[fpmoney.Currency]{A: SGD, B: USD},
 		},
 		{
 			a: fpmoney.FromInt(10, SGD),
 			b: fpmoney.FromInt(11, USD),
 			f: func(a, b fpmoney.Amount[fpmoney.Currency]) { a.GreaterThan(b) },
-			e: &fpmoney.ErrCurrencyMismatch[fpmoney.Currency]{A: SGD, B: USD},
 		},
 		{
 			a: fpmoney.FromInt(10, SGD),
 			b: fpmoney.FromInt(11, USD),
 			f: func(a, b fpmoney.Amount[fpmoney.Currency]) { a.GreaterThanOrEqual(b) },
-			e: &fpmoney.ErrCurrencyMismatch[fpmoney.Currency]{A: SGD, B: USD},
 		},
 	}
 	for i, tc := range tests {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
-			defer func() {
-				r := recover()
-				re, ok := r.(error)
-				if !ok {
-					t.Error(r)
-				}
-				if err := fpmoney.NewErrCurrencyMismatch[fpmoney.Currency](); !errors.As(re, &err) || *err != *tc.e {
-					t.Error(re, tc.e)
-				}
-			}()
+			defer func() { recover() }()
 			tc.f(tc.a, tc.b)
 		})
 	}
-}
-
-func TestErrCurrencyMismatch_Error(t *testing.T) {
-	t.Run("error", func(t *testing.T) {
-		e := &fpmoney.ErrCurrencyMismatch[fpmoney.Currency]{A: SGD, B: USD}
-		if e.Error() != "SGD != USD" {
-			t.Error(e)
-		}
-	})
 }

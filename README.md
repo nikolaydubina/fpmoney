@@ -107,60 +107,60 @@ $ go test -bench=. -benchmem ./...
 goos: darwin
 goarch: arm64
 pkg: github.com/nikolaydubina/fpmoney
-BenchmarkArithmetic/add_x1-10                   1000000000             0.5 ns/op           0 B/op           0 allocs/op
-BenchmarkArithmetic/add_x100-10                   12525424            51.9 ns/op           0 B/op           0 allocs/op
-BenchmarkJSONUnmarshal/small-10                    3610992           329.8 ns/op         198 B/op           3 allocs/op
-BenchmarkJSONUnmarshal/large-10                    2901363           412.4 ns/op         216 B/op           3 allocs/op
-BenchmarkJSONMarshal/small-10                      5032456           238.1 ns/op         160 B/op           3 allocs/op
-BenchmarkJSONMarshal/large-10                      4072776           295.5 ns/op         176 B/op           3 allocs/op
-BenchmarkJSONMarshal_Exact/small-10               40404832            29.6 ns/op         112 B/op           1 allocs/op
-BenchmarkJSONMarshal_Exact/large-10               28532677            41.6 ns/op         112 B/op           1 allocs/op
+BenchmarkArithmetic/add_x1-10                  418765521           2.814 ns/op           0 B/op           0 allocs/op
+BenchmarkArithmetic/add_x100-10                  4233792           284.5 ns/op           0 B/op           0 allocs/op
+BenchmarkJSONUnmarshal/small-10                  2396784           502.9 ns/op         262 B/op           5 allocs/op
+BenchmarkJSONUnmarshal/large-10                  2183724           550.0 ns/op         280 B/op           5 allocs/op
+BenchmarkJSONMarshal/small-10                    4962476           241.2 ns/op          88 B/op           5 allocs/op
+BenchmarkJSONMarshal/large-10                    4245574           282.8 ns/op         120 B/op           5 allocs/op
+BenchmarkJSONMarshal_Exact/small-10              4946193           243.9 ns/op          88 B/op           5 allocs/op
+BenchmarkJSONMarshal_Exact/large-10              4183228           284.2 ns/op         120 B/op           5 allocs/op
 PASS
-ok      github.com/nikolaydubina/fpmoney    62.744s
+ok      github.com/nikolaydubina/fpmoney    12.408s
 ```
 
 `float32` (old) and `fpmoney` (new)
 ```
 $ benchstat -split="XYZ" float32.bench fpmoney.bench
 name                    old time/op    new time/op    delta
-JSONUnmarshal/small-10     502ns ± 0%     338ns ± 1%   -32.63%  (p=0.008 n=5+5)
-JSONUnmarshal/large-10     572ns ± 0%     419ns ± 1%   -26.79%  (p=0.008 n=5+5)
-JSONMarshal/small-10       189ns ± 0%     245ns ± 1%   +29.12%  (p=0.008 n=5+5)
-JSONMarshal/large-10       176ns ± 0%     305ns ± 1%   +73.07%  (p=0.008 n=5+5)
+JSONUnmarshal/small-10     502ns ± 0%     503ns ± 0%     ~     (p=1.000 n=5+1)
+JSONUnmarshal/large-10     572ns ± 0%     550ns ± 0%     ~     (p=0.333 n=5+1)
+JSONMarshal/small-10       189ns ± 0%     241ns ± 0%     ~     (p=0.333 n=5+1)
+JSONMarshal/large-10       176ns ± 0%     283ns ± 0%     ~     (p=0.333 n=5+1)
 
 name                    old alloc/op   new alloc/op   delta
-JSONUnmarshal/small-10      271B ± 0%      198B ± 0%   -26.94%  (p=0.008 n=5+5)
-JSONUnmarshal/large-10      312B ± 0%      216B ± 0%   -30.77%  (p=0.008 n=5+5)
-JSONMarshal/small-10       66.0B ± 0%    160.0B ± 0%  +142.42%  (p=0.008 n=5+5)
-JSONMarshal/large-10       72.0B ± 0%    176.0B ± 0%  +144.44%  (p=0.008 n=5+5)
+JSONUnmarshal/small-10      271B ± 0%      262B ± 0%   -3.32%  (p=0.000 n=5+1)
+JSONUnmarshal/large-10      312B ± 0%      280B ± 0%  -10.26%  (p=0.000 n=5+1)
+JSONMarshal/small-10       66.0B ± 0%     88.0B ± 0%     ~     (p=0.333 n=5+1)
+JSONMarshal/large-10       72.0B ± 0%    120.0B ± 0%     ~     (p=0.333 n=5+1)
 
 name                    old allocs/op  new allocs/op  delta
-JSONUnmarshal/small-10      6.00 ± 0%      3.00 ± 0%   -50.00%  (p=0.008 n=5+5)
-JSONUnmarshal/large-10      7.00 ± 0%      3.00 ± 0%   -57.14%  (p=0.008 n=5+5)
-JSONMarshal/small-10        2.00 ± 0%      3.00 ± 0%   +50.00%  (p=0.008 n=5+5)
-JSONMarshal/large-10        2.00 ± 0%      3.00 ± 0%   +50.00%  (p=0.008 n=5+5)
+JSONUnmarshal/small-10      6.00 ± 0%      5.00 ± 0%  -16.67%  (p=0.000 n=5+1)
+JSONUnmarshal/large-10      7.00 ± 0%      5.00 ± 0%  -28.57%  (p=0.000 n=5+1)
+JSONMarshal/small-10        2.00 ± 0%      5.00 ± 0%     ~     (p=0.333 n=5+1)
+JSONMarshal/large-10        2.00 ± 0%      5.00 ± 0%     ~     (p=0.333 n=5+1)
 ```
 
 `int`, `float32`, `fpmoney`
 ```
 $ benchstat -split="XYZ" int.bench float32.bench fpmoney.bench
 name \ time/op              int.bench   float32.bench  fpmoney.bench
-JSONUnmarshal/small-10      481ns ± 2%     502ns ± 0%     338ns ± 1%
-JSONUnmarshal/large-10      530ns ± 1%     572ns ± 0%     419ns ± 1%
-JSONMarshal/small-10        140ns ± 1%     189ns ± 0%     245ns ± 1%
-JSONMarshal/large-10        145ns ± 0%     176ns ± 0%     305ns ± 1%
+JSONUnmarshal/small-10      481ns ± 2%     502ns ± 0%     503ns ± 0%
+JSONUnmarshal/large-10      530ns ± 1%     572ns ± 0%     550ns ± 0%
+JSONMarshal/small-10        140ns ± 1%     189ns ± 0%     241ns ± 0%
+JSONMarshal/large-10        145ns ± 0%     176ns ± 0%     283ns ± 0%
 
 name \ alloc/op             int.bench   float32.bench  fpmoney.bench
-JSONUnmarshal/small-10       269B ± 0%      271B ± 0%      198B ± 0%
-JSONUnmarshal/large-10       288B ± 0%      312B ± 0%      216B ± 0%
-JSONMarshal/small-10        57.0B ± 0%     66.0B ± 0%    160.0B ± 0%
-JSONMarshal/large-10        72.0B ± 0%     72.0B ± 0%    176.0B ± 0%
+JSONUnmarshal/small-10       269B ± 0%      271B ± 0%      262B ± 0%
+JSONUnmarshal/large-10       288B ± 0%      312B ± 0%      280B ± 0%
+JSONMarshal/small-10        57.0B ± 0%     66.0B ± 0%     88.0B ± 0%
+JSONMarshal/large-10        72.0B ± 0%     72.0B ± 0%    120.0B ± 0%
 
 name \ allocs/op            int.bench   float32.bench  fpmoney.bench
-JSONUnmarshal/small-10       6.00 ± 0%      6.00 ± 0%      3.00 ± 0%
-JSONUnmarshal/large-10       7.00 ± 0%      7.00 ± 0%      3.00 ± 0%
-JSONMarshal/small-10         2.00 ± 0%      2.00 ± 0%      3.00 ± 0%
-JSONMarshal/large-10         2.00 ± 0%      2.00 ± 0%      3.00 ± 0%
+JSONUnmarshal/small-10       6.00 ± 0%      6.00 ± 0%      5.00 ± 0%
+JSONUnmarshal/large-10       7.00 ± 0%      7.00 ± 0%      5.00 ± 0%
+JSONMarshal/small-10         2.00 ± 0%      2.00 ± 0%      5.00 ± 0%
+JSONMarshal/large-10         2.00 ± 0%      2.00 ± 0%      5.00 ± 0%
 ```
 
 ## References
@@ -240,11 +240,12 @@ API is the same, but much safer.
 Using `comparable` generic constraint is attractive option, since it allows to plug-in any type for currencies, including from other packages.
 Marshalling and Unamrshalling will be fully delegated to other packages too.
 However, this inccurs penalty for performance.
-Arithmetics is 3x slower, and due to `json` pacakge `mallocs` increase 2x. 
+Arithmetics is 6x slower.
+JSON decoding is 20% slower, and `mallocs` increase 2x. 
 
 ```go
 type Amount[T comparable] struct {
-	Amount   fpdecimal.Decimal `json:"amount"`
-	Currency T                 `json:"currency"`
+    Amount   fpdecimal.Decimal `json:"amount"`
+    Currency T                 `json:"currency"`
 }
 ```
