@@ -10,7 +10,7 @@ import (
 // Zero value is undefined currency.
 type Currency struct{ v uint8 }
 
-func (c Currency) String() string { return currencies[c.v] }
+func (c Currency) String() string { return currencies[c.v+1] }
 
 func (c Currency) MarshalText() (text []byte, err error) { return []byte(c.String()), nil }
 
@@ -32,7 +32,14 @@ var (
 )
 
 func init() {
+	// zero value currency
+	currencies = append(currencies, "")
+	fromAlpha[""] = Currency{}
+
 	for i, s := range strings.Split(currencyCSV, "\n") {
+		if s == "" {
+			continue
+		}
 		fromAlpha[s] = Currency{v: uint8(i)}
 		currencies = append(currencies, s)
 	}
