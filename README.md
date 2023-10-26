@@ -251,3 +251,23 @@ type Amount[T comparable] struct {
 	Currency T                 `json:"currency"`
 }
 ```
+
+## Appendix F: Global Singleton for currency
+
+Typically systems have single currency they deal with. 
+The major feature that is needed for such cases is protection from airhtmetics with non-money types, parsing, printing, and detecting on input bad currency.
+This all can be accomplished with global single ton currency string and number of minor units.
+Basically, instead of dragging currency enum (uint8) in every single amount variable, we are now reducing amount to contain only `int64` and currency is not global for whole system.
+Turns out, there is no much benefit in doing so. All operations, Airthmetics, Printing, Parsing is little bit faster, but almost not noticeable.
+Thus, it is fairly safe to include currency enum at runtime for amount at almost no cost.
+
+```
+BenchmarkArithmetic/add_x1-10             1000000000             0.46 ns/op           0 B/op           0 allocs/op
+BenchmarkArithmetic/add_x100-10             27101086            40.69 ns/op           0 B/op           0 allocs/op
+BenchmarkJSONUnmarshal/small-10              3822724           308.5  ns/op         152 B/op           2 allocs/op
+BenchmarkJSONUnmarshal/large-10              3073228           387.2  ns/op         152 B/op           2 allocs/op
+BenchmarkJSONMarshal/small-10                4851312           224.5  ns/op         144 B/op           2 allocs/op
+BenchmarkJSONMarshal/large-10                4196076           289.1  ns/op         168 B/op           3 allocs/op
+BenchmarkJSONMarshal_Exact/small-10         36865509            29.14 ns/op         112 B/op           1 allocs/op
+BenchmarkJSONMarshal_Exact/large-10         29832595            38.86 ns/op         112 B/op           1 allocs/op
+```
