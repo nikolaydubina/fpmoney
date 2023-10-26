@@ -78,7 +78,7 @@ func (a Amount) Div(b int) (part Amount, remainder Amount) {
 }
 
 func (a Amount) String() string {
-	return fpdecimal.FixedPointDecimalToString(int64(a.v), a.c.Exponent()) + " " + a.c.Alpha()
+	return fpdecimal.FixedPointDecimalToString(a.v, a.c.Exponent()) + " " + a.c.Alpha()
 }
 
 const (
@@ -153,7 +153,7 @@ func (a Amount) MarshalJSON() ([]byte, error) {
 	b = append(b, `,"`...)
 	b = append(b, keyCurrency...)
 	b = append(b, `":"`...)
-	b = append(b, currencies[a.c].alpha...)
+	b = append(b, a.c.Alpha()...)
 	b = append(b, `"}`...)
 	return b, nil
 }

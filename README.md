@@ -55,7 +55,7 @@ fmt.Println(a, r)
 
 a, r = x.Div(5)
 fmt.Println(a, r)
-// Output: 0.20 SGD 0 SGD
+// Output: 0.2 SGD 0 SGD
 ```
 
 ### Equality
