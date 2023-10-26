@@ -371,7 +371,7 @@ var (
 
 var currencies = map[Currency]struct {
 	alpha    string
-	exponent int
+	exponent uint8
 }{
 	AED: {alpha: "AED", exponent: 2},
 	AFN: {alpha: "AFN", exponent: 2},

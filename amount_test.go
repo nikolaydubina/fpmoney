@@ -46,7 +46,7 @@ func ExampleAmount_Div_whole() {
 	x := fpmoney.FromInt(1, fpmoney.SGD)
 	a, r := x.Div(5)
 	fmt.Println(a, r)
-	// Output: 0.20 SGD 0 SGD
+	// Output: 0.2 SGD 0 SGD
 }
 
 func ExampleAmount_equality() {
@@ -412,19 +412,19 @@ func TestMarshalJSON(t *testing.T) {
 			v: fpmoney.FromIntScaled(-101, fpmoney.SGD),
 		},
 		{
-			s: `{"amount":1.00,"currency":"SGD"}`,
+			s: `{"amount":1,"currency":"SGD"}`,
 			v: fpmoney.FromInt(1, fpmoney.SGD),
 		},
 		{
-			s: `{"amount":5.00,"currency":"SGD"}`,
+			s: `{"amount":5,"currency":"SGD"}`,
 			v: fpmoney.FromInt(5, fpmoney.SGD),
 		},
 		{
-			s: `{"amount":-1.00,"currency":"SGD"}`,
+			s: `{"amount":-1,"currency":"SGD"}`,
 			v: fpmoney.FromInt(-1, fpmoney.SGD),
 		},
 		{
-			s: `{"amount":-5.00,"currency":"SGD"}`,
+			s: `{"amount":-5,"currency":"SGD"}`,
 			v: fpmoney.FromInt(-5, fpmoney.SGD),
 		},
 		// 0 cents

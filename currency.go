@@ -8,7 +8,7 @@ type Currency struct{ v uint8 }
 func (c Currency) Alpha() string { return currencies[c].alpha }
 
 // Exponent returns the decimal point location.
-func (c Currency) Exponent() int { return currencies[c].exponent }
+func (c Currency) Exponent() uint8 { return currencies[c].exponent }
 
 func (c Currency) String() string { return c.Alpha() }
 
