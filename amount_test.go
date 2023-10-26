@@ -1,12 +1,12 @@
 package fpmoney_test
 
 import (
+	"bytes"
 	_ "embed"
 	"encoding/json"
 	"fmt"
 	"log"
 	"strconv"
-	"strings"
 	"testing"
 
 	"github.com/nikolaydubina/fpmoney"
@@ -46,7 +46,7 @@ func ExampleAmount_DivMod_part() {
 	// Output: 0.33 SGD 0.01 SGD
 }
 
-func ExampleAmount_Div_whole() {
+func ExampleAmount_DivMod_whole() {
 	x := fpmoney.FromInt(1)
 	a, r := x.DivMod(5)
 	fmt.Println(a, r)
@@ -65,13 +65,6 @@ func ExampleAmount_equality_same_currency() {
 	y := fpmoney.FromInt(10)
 	fmt.Println(y == x)
 	// Output: true
-}
-
-func ExampleAmount_equality_wrong_currency() {
-	x := fpmoney.FromInt(10)
-	y := fpmoney.FromInt(10)
-	fmt.Println(y == x)
-	// Output: false
 }
 
 func ExampleFromFloat() {
@@ -142,6 +135,9 @@ func FuzzArithmetics(f *testing.F) {
 }
 
 func FuzzJSONUnmarshal_Float(f *testing.F) {
+	fpmoney.Currency = "USD"
+	fpmoney.CurrencyMinorUnits = 2
+
 	tests := []float32{
 		0,
 		0.100,
@@ -251,6 +247,9 @@ func FuzzJSONUnmarshal_NoPanic(f *testing.F) {
 }
 
 func FuzzToFloat(f *testing.F) {
+	fpmoney.Currency = "KRW"
+	fpmoney.CurrencyMinorUnits = 0
+
 	tests := []int64{
 		0,
 		1,
@@ -337,7 +336,7 @@ func TestUnmarshalJSON(t *testing.T) {
 
 	t.Run("zero cents", func(t *testing.T) {
 		fpmoney.Currency = "KRW"
-		fpmoney.CurrencyMinorUnits = 3
+		fpmoney.CurrencyMinorUnits = 0
 
 		tests := []struct {
 			s string
@@ -368,7 +367,7 @@ func TestUnmarshalJSON(t *testing.T) {
 					t.Error(err)
 				}
 				if tc.v != v {
-					t.Error(tc.v, v)
+					t.Error("expected", tc.v, "got", v)
 				}
 			})
 		}
@@ -440,7 +439,7 @@ func TestMarshalJSON(t *testing.T) {
 
 	t.Run("zero cents", func(t *testing.T) {
 		fpmoney.Currency = "KRW"
-		fpmoney.CurrencyMinorUnits = 3
+		fpmoney.CurrencyMinorUnits = 0
 
 		tests := []struct {
 			s string
@@ -479,32 +478,16 @@ func TestMarshalJSON(t *testing.T) {
 }
 
 func FuzzJSON_MarshalUnmarshal(f *testing.F) {
-	currencies := [...]struct {
-		currency   string
-		minorUnits int
-	}{
-		{currency: "KRW", minorUnits: 3},
-		{currency: "SGD", minorUnits: 2},
-		{currency: "BHD", minorUnits: 2},
-		{currency: "CLF", minorUnits: 2},
-	}
-
 	tests := []int64{
 		123456,
 		0,
 		1,
 	}
 	for _, tc := range tests {
-		for i := range currencies {
-			f.Add(tc, i)
-			f.Add(-tc, i)
-		}
+		f.Add(tc)
+		f.Add(-tc)
 	}
-	f.Fuzz(func(t *testing.T, v int64, c int) {
-		if c > len(currencies)-1 || c < 0 {
-			t.Skip()
-		}
-
+	f.Fuzz(func(t *testing.T, v int64) {
 		q := fpmoney.FromIntScaled(v)
 
 		s, err := json.Marshal(q)
@@ -518,7 +501,7 @@ func FuzzJSON_MarshalUnmarshal(f *testing.F) {
 		}
 
 		if x != q {
-			t.Error(x, q, v, c, s)
+			t.Error(x, q, v, s)
 		}
 	})
 }
@@ -548,34 +531,36 @@ func BenchmarkArithmetic(b *testing.B) {
 	}
 }
 
-//go:embed testdata/amount-float-large.jsonl
-var amountFloatLargeJSONL string
-
 //go:embed testdata/amount-float-small.jsonl
-var amountFloatSmallJSONL string
+var amountFloatSmallJSONL []byte
+
+//go:embed testdata/amount-float-large.jsonl
+var amountFloatLargeJSONL []byte
 
 var testsFloats = []struct {
 	name string
-	vals []string
+	vals [][]byte
 }{
 	{
 		name: "small",
-		vals: strings.Split(amountFloatSmallJSONL, "\n"),
+		vals: bytes.Split(amountFloatSmallJSONL, []byte("\n")),
 	},
 	{
 		name: "large",
-		vals: strings.Split(amountFloatLargeJSONL, "\n"),
+		vals: bytes.Split(amountFloatLargeJSONL, []byte("\n")),
 	},
 }
 
 func BenchmarkJSONUnmarshal(b *testing.B) {
+	fpmoney.Currency = "KRW"
+	fpmoney.CurrencyMinorUnits = 3
+
 	var s fpmoney.Amount
 	for _, tc := range testsFloats {
 		b.Run(tc.name, func(b *testing.B) {
 			for n := 0; n < b.N; n++ {
-				err := json.Unmarshal([]byte(tc.vals[n%len(tc.vals)]), &s)
-				if err != nil || s == fpmoney.FromInt(0) {
-					b.Error(s, err)
+				if err := json.Unmarshal(tc.vals[n%len(tc.vals)], &s); err != nil || s == fpmoney.FromInt(0) {
+					b.Error("got", s, "err", err, "text", string(tc.vals[n%len(tc.vals)]))
 				}
 			}
 		})
@@ -583,13 +568,16 @@ func BenchmarkJSONUnmarshal(b *testing.B) {
 }
 
 func BenchmarkJSONMarshal(b *testing.B) {
+	fpmoney.Currency = "KRW"
+	fpmoney.CurrencyMinorUnits = 0
+
 	var s []byte
 	var err error
 	for _, tc := range testsFloats {
 		tests := make([]fpmoney.Amount, 0, len(tc.vals))
 		for _, q := range tc.vals {
 			var x fpmoney.Amount
-			if err := json.Unmarshal([]byte(q), &x); err != nil {
+			if err := json.Unmarshal(q, &x); err != nil {
 				b.Error(err)
 			}
 			tests = append(tests, x)
@@ -603,7 +591,7 @@ func BenchmarkJSONMarshal(b *testing.B) {
 				if err != nil {
 					b.Error(err)
 				}
-				if string(s) == "" {
+				if len(s) == 0 {
 					b.Error("empty str")
 				}
 			}
@@ -612,13 +600,16 @@ func BenchmarkJSONMarshal(b *testing.B) {
 }
 
 func BenchmarkJSONMarshal_Exact(b *testing.B) {
+	fpmoney.Currency = "KRW"
+	fpmoney.CurrencyMinorUnits = 0
+
 	var s []byte
 	var err error
 	for _, tc := range testsFloats {
 		tests := make([]fpmoney.Amount, 0, len(tc.vals))
 		for _, q := range tc.vals {
 			var x fpmoney.Amount
-			if err := json.Unmarshal([]byte(q), &x); err != nil {
+			if err := json.Unmarshal(q, &x); err != nil {
 				b.Error(err)
 			}
 			tests = append(tests, x)
@@ -632,7 +623,7 @@ func BenchmarkJSONMarshal_Exact(b *testing.B) {
 				if err != nil {
 					b.Error(err)
 				}
-				if string(s) == "" {
+				if len(s) == 0 {
 					b.Error("empty str")
 				}
 			}
