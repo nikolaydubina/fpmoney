@@ -139,7 +139,7 @@ func (a *Amount) UnmarshalJSON(b []byte) (err error) {
 		return &ErrWrongCurrencyString{}
 	}
 
-	a.v, err = fpdecimal.ParseFixedPointDecimal(string(b[as:ae]), int8(a.c.Exponent()))
+	a.v, err = fpdecimal.ParseFixedPointDecimal(b[as:ae], a.c.Exponent())
 
 	return err
 }
