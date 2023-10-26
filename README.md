@@ -13,7 +13,6 @@
 
 * as fast as `int64`
 * no `float` in parsing nor printing
-* `ISO 4217` currency
 * block mismatched currency arithmetics
 * does not leak precision
 * parsing faster than `int`, `float`, `string`

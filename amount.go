@@ -4,81 +4,54 @@ import (
 	"github.com/nikolaydubina/fpdecimal"
 )
 
+var (
+	Currency           string = "USD"
+	CurrencyMinorUnits uint8  = 2
+
+	multiplier = [...]int{1, 10, 100, 1000, 10000}
+)
+
 // Amount stores fixed-precision decimal money.
-// Stores integer number of cents for ISO 4217 currency.
 // Values fit in ~92 quadrillion for 2 decimal currencies.
 // Does not use float in printing nor parsing.
 // Rounds down fractional cents during parsing.
 // Blocking arithmetic operations that result in loss of precision.
-type Amount struct {
-	v int64
-	c Currency
-	_ uint8  // padding for improved line alignment, 2x improves arithmetics
-	_ uint32 // padding
+type Amount struct{ v int64 }
+
+func FromIntScaled[T ~int | ~int8 | ~int16 | ~int32 | ~int64](v T) Amount { return Amount{v: int64(v)} }
+
+func FromInt[T ~int | ~int8 | ~int16 | ~int32 | ~int64](v T) Amount {
+	return Amount{v: int64(v) * int64(multiplier[CurrencyMinorUnits])}
 }
 
-func FromIntScaled[T ~int | ~int8 | ~int16 | ~int32 | ~int64](v T, currency Currency) Amount {
-	return Amount{v: int64(v), c: currency}
+func FromFloat[T ~float32 | ~float64](v T) Amount {
+	return Amount{v: int64(T(v) * T(multiplier[CurrencyMinorUnits]))}
 }
 
-func FromInt[T ~int | ~int8 | ~int16 | ~int32 | ~int64](v T, currency Currency) Amount {
-	return Amount{v: int64(v) * currency.scale(), c: currency}
-}
+func (a Amount) Float32() float32 { return float32(a.v) / float32(multiplier[CurrencyMinorUnits]) }
 
-func FromFloat[T ~float32 | ~float64](v T, currency Currency) Amount {
-	return Amount{v: int64(T(v) * T(currency.scale())), c: currency}
-}
+func (a Amount) Float64() float64 { return float64(a.v) / float64(multiplier[CurrencyMinorUnits]) }
 
-func (a Amount) Float32() float32 { return float32(a.v) / float32(a.c.scale()) }
+func (a Amount) Add(b Amount) Amount { return Amount{v: a.v + b.v} }
 
-func (a Amount) Float64() float64 { return float64(a.v) / float64(a.c.scale()) }
+func (a Amount) Sub(b Amount) Amount { return Amount{v: a.v - b.v} }
 
-func (a Amount) Currency() Currency { return a.c }
+func (a Amount) GreaterThan(b Amount) bool { return a.v > b.v }
 
-func (a Amount) Add(b Amount) Amount {
-	checkCurrency(a.c, b.c)
-	return Amount{v: a.v + b.v, c: a.c}
-}
+func (a Amount) LessThan(b Amount) bool { return a.v < b.v }
 
-func (a Amount) Sub(b Amount) Amount {
-	checkCurrency(a.c, b.c)
-	return Amount{v: a.v - b.v, c: a.c}
-}
+func (a Amount) GreaterThanOrEqual(b Amount) bool { return a.v >= b.v }
 
-func (a Amount) GreaterThan(b Amount) bool {
-	checkCurrency(a.c, b.c)
-	return a.v > b.v
-}
+func (a Amount) LessThanOrEqual(b Amount) bool { return a.v <= b.v }
 
-func (a Amount) LessThan(b Amount) bool {
-	checkCurrency(a.c, b.c)
-	return a.v < b.v
-}
+func (a Amount) Mul(b int) Amount { return Amount{v: a.v * int64(b)} }
 
-func (a Amount) GreaterThanOrEqual(b Amount) bool {
-	checkCurrency(a.c, b.c)
-	return a.v >= b.v
-}
-
-func (a Amount) LessThanOrEqual(b Amount) bool {
-	checkCurrency(a.c, b.c)
-	return a.v <= b.v
-}
-
-func checkCurrency(a, b Currency) {
-	if a != b {
-		panic(&ErrCurrencyMismatch{A: a, B: b})
-	}
-}
-
-func (a Amount) Mul(b int) Amount { return Amount{v: a.v * int64(b), c: a.c} }
-
-func (a Amount) Div(b int) (part Amount, remainder Amount) {
-	return Amount{v: a.v / int64(b), c: a.c}, Amount{v: a.v % int64(b), c: a.c}
+func (a Amount) DivMod(b int) (part, remainder Amount) {
+	return Amount{v: a.v / int64(b)}, Amount{v: a.v % int64(b)}
 }
 
 func (a Amount) String() string {
-	return fpdecimal.FixedPointDecimalToString(a.v, a.c.Exponent()) + " " + a.c.Alpha()
+	return fpdecimal.FixedPointDecimalToString(a.v, CurrencyMinorUnits) + " " + Currency
 }
 
 const (
@@ -106,17 +79,16 @@ func (a *Amount) UnmarshalJSON(b []byte) (err error) {
 			for ; i < len(b) && b[i] != '"'; i++ {
 			}
 			if i == len(b) {
-				return &ErrWrongCurrencyString{}
+				return &errorString{"wrong currency"}
 			}
 			i++ // opening `"`
 			e = i + lenISO427Currency
 			if e > len(b) {
-				return &ErrWrongCurrencyString{}
+				return &errorString{"wrong currency"}
 			}
 
-			a.c, err = CurrencyFromAlpha(string(b[i:e]))
-			if err != nil {
-				return err
+			if string(b[i:e]) != Currency {
+				return &errorString{"wrong currency"}
 			}
 			i = e
 		}
@@ -135,11 +107,7 @@ func (a *Amount) UnmarshalJSON(b []byte) (err error) {
 		}
 	}
 
-	if a.c.IsUndefined() {
-		return &ErrWrongCurrencyString{}
-	}
-
-	a.v, err = fpdecimal.ParseFixedPointDecimal(b[as:ae], a.c.Exponent())
+	a.v, err = fpdecimal.ParseFixedPointDecimal(b[as:ae], CurrencyMinorUnits)
 
 	return err
 }
@@ -149,11 +117,15 @@ func (a Amount) MarshalJSON() ([]byte, error) {
 	b = append(b, `{"`...)
 	b = append(b, keyAmount...)
 	b = append(b, `":`...)
-	b = fpdecimal.AppendFixedPointDecimal(b, a.v, a.c.Exponent())
+	b = fpdecimal.AppendFixedPointDecimal(b, a.v, CurrencyMinorUnits)
 	b = append(b, `,"`...)
 	b = append(b, keyCurrency...)
 	b = append(b, `":"`...)
-	b = append(b, a.c.Alpha()...)
+	b = append(b, Currency...)
 	b = append(b, `"}`...)
 	return b, nil
 }
+
+type errorString struct{ v string }
+
+func (e *errorString) Error() string { return e.v }
