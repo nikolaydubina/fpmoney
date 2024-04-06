@@ -22,7 +22,7 @@ func FromIntScaled[T ~int | ~int8 | ~int16 | ~int32 | ~int64](v T, currency Curr
 }
 
 func FromInt[T ~int | ~int8 | ~int16 | ~int32 | ~int64](v T, currency Currency) Amount {
-	return Amount{v: int64(v) * currency.scale(), c: currency}
+	return Amount{v: int64(v) * int64(currency.scale()), c: currency}
 }
 
 func FromFloat[T ~float32 | ~float64](v T, currency Currency) Amount {
@@ -78,7 +78,7 @@ func (a Amount) Div(b int) (part Amount, remainder Amount) {
 }
 
 func (a Amount) String() string {
-	return fpdecimal.FixedPointDecimalToString(a.v, a.c.Exponent()) + " " + a.c.Alpha()
+	return fpdecimal.FixedPointDecimalToString(a.v, a.c.Exponent()) + " " + a.c.String()
 }
 
 const (
@@ -114,8 +114,7 @@ func (a *Amount) UnmarshalJSON(b []byte) (err error) {
 				return &ErrWrongCurrencyString{}
 			}
 
-			a.c, err = CurrencyFromAlpha(string(b[i:e]))
-			if err != nil {
+			if err := a.c.UnmarshalText(b[i:e]); err != nil {
 				return err
 			}
 			i = e
@@ -135,10 +134,6 @@ func (a *Amount) UnmarshalJSON(b []byte) (err error) {
 		}
 	}
 
-	if a.c.IsUndefined() {
-		return &ErrWrongCurrencyString{}
-	}
-
 	a.v, err = fpdecimal.ParseFixedPointDecimal(b[as:ae], a.c.Exponent())
 
 	return err
@@ -153,7 +148,21 @@ func (a Amount) MarshalJSON() ([]byte, error) {
 	b = append(b, `,"`...)
 	b = append(b, keyCurrency...)
 	b = append(b, `":"`...)
-	b = append(b, a.c.Alpha()...)
+	b = append(b, a.c.String()...)
 	b = append(b, `"}`...)
 	return b, nil
 }
+
+type ErrCurrencyMismatch struct {
+	A, B Currency
+}
+
+func NewErrCurrencyMismatch() *ErrCurrencyMismatch { return &ErrCurrencyMismatch{} }
+
+func (e *ErrCurrencyMismatch) Error() string { return e.A.String() + " != " + e.B.String() }
+
+type ErrWrongCurrencyString struct{}
+
+func NewErrWrongCurrencyString() *ErrWrongCurrencyString { return &ErrWrongCurrencyString{} }
+
+func (e *ErrWrongCurrencyString) Error() string { return "wrong currency string" }
