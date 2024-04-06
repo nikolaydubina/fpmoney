@@ -1,48 +1,191 @@
 package fpmoney
 
+//go:generate go run github.com/nikolaydubina/go-enum-encoding@latest -type=Currency
+
 // Currency is ISO 4217 without deprecated currencies.
-// Zero value is undefined currency.
 type Currency struct{ v uint8 }
 
-// Alpha returns the ISO 4217 three-letter alphabetic code.
-func (c Currency) Alpha() string { return currencies[c].alpha }
-
-// Exponent returns the decimal point location.
-func (c Currency) Exponent() uint8 { return currencies[c].exponent }
-
-func (c Currency) String() string { return c.Alpha() }
-
-func (c Currency) IsUndefined() bool { return c.v == 0 }
-
-func (c *Currency) UnmarshalText(text []byte) error {
-	v, ok := fromAlpha[string(text)]
-	if !ok {
-		return &ErrWrongCurrencyString{}
-	}
-	*c = v
-	return nil
-}
-
-func (c Currency) MarshalText() (text []byte, err error) { return []byte(currencies[c].alpha), nil }
-
-// CurrencyFromAlpha returns Currency for the three-letter alpha code.
-// Or an error if it does not exist.
-func CurrencyFromAlpha(alpha string) (Currency, error) {
-	if c, ok := fromAlpha[alpha]; ok {
-		return c, nil
-	}
-	return Currency{}, &ErrWrongCurrencyString{}
-}
-
-func (c Currency) scale() int64 {
-	switch c.Exponent() {
-	case 4:
-		return 10000
-	case 3:
-		return 1000
-	case 2:
-		return 100
-	default:
-		return 1
-	}
-}
+var (
+	Undefined = Currency{}    // json:""
+	AED       = Currency{1}   // json:"AED"
+	AFN       = Currency{2}   // json:"AFN"
+	ALL       = Currency{3}   // json:"ALL"
+	AMD       = Currency{4}   // json:"AMD"
+	ANG       = Currency{5}   // json:"ANG"
+	AOA       = Currency{6}   // json:"AOA"
+	ARS       = Currency{7}   // json:"ARS"
+	AUD       = Currency{8}   // json:"AUD"
+	AWG       = Currency{9}   // json:"AWG"
+	AZN       = Currency{10}  // json:"AZN"
+	BAM       = Currency{11}  // json:"BAM"
+	BBD       = Currency{12}  // json:"BBD"
+	BDT       = Currency{13}  // json:"BDT"
+	BGN       = Currency{14}  // json:"BGN"
+	BHD       = Currency{15}  // json:"BHD"
+	BIF       = Currency{16}  // json:"BIF"
+	BMD       = Currency{17}  // json:"BMD"
+	BND       = Currency{18}  // json:"BND"
+	BOB       = Currency{19}  // json:"BOB"
+	BOV       = Currency{20}  // json:"BOV"
+	BRL       = Currency{21}  // json:"BRL"
+	BSD       = Currency{22}  // json:"BSD"
+	BTN       = Currency{23}  // json:"BTN"
+	BWP       = Currency{24}  // json:"BWP"
+	BYN       = Currency{25}  // json:"BYN"
+	BZD       = Currency{26}  // json:"BZD"
+	CAD       = Currency{27}  // json:"CAD"
+	CDF       = Currency{28}  // json:"CDF"
+	CHE       = Currency{29}  // json:"CHE"
+	CHF       = Currency{30}  // json:"CHF"
+	CHW       = Currency{31}  // json:"CHW"
+	CLF       = Currency{32}  // json:"CLF"
+	CLP       = Currency{33}  // json:"CLP"
+	CNY       = Currency{34}  // json:"CNY"
+	COP       = Currency{35}  // json:"COP"
+	COU       = Currency{36}  // json:"COU"
+	CRC       = Currency{37}  // json:"CRC"
+	CUP       = Currency{38}  // json:"CUP"
+	CVE       = Currency{39}  // json:"CVE"
+	CZK       = Currency{40}  // json:"CZK"
+	DJF       = Currency{41}  // json:"DJF"
+	DKK       = Currency{42}  // json:"DKK"
+	DOP       = Currency{43}  // json:"DOP"
+	DZD       = Currency{44}  // json:"DZD"
+	EGP       = Currency{45}  // json:"EGP"
+	ERN       = Currency{46}  // json:"ERN"
+	ETB       = Currency{47}  // json:"ETB"
+	EUR       = Currency{48}  // json:"EUR"
+	FJD       = Currency{49}  // json:"FJD"
+	FKP       = Currency{50}  // json:"FKP"
+	GBP       = Currency{51}  // json:"GBP"
+	GEL       = Currency{52}  // json:"GEL"
+	GHS       = Currency{53}  // json:"GHS"
+	GIP       = Currency{54}  // json:"GIP"
+	GMD       = Currency{55}  // json:"GMD"
+	GNF       = Currency{56}  // json:"GNF"
+	GTQ       = Currency{57}  // json:"GTQ"
+	GYD       = Currency{58}  // json:"GYD"
+	HKD       = Currency{59}  // json:"HKD"
+	HNL       = Currency{60}  // json:"HNL"
+	HRD       = Currency{61}  // json:"HRD"
+	HRK       = Currency{62}  // json:"HRK"
+	HTG       = Currency{63}  // json:"HTG"
+	HUF       = Currency{64}  // json:"HUF"
+	IDR       = Currency{65}  // json:"IDR"
+	ILS       = Currency{66}  // json:"ILS"
+	INR       = Currency{67}  // json:"INR"
+	IQD       = Currency{68}  // json:"IQD"
+	IRR       = Currency{69}  // json:"IRR"
+	ISK       = Currency{70}  // json:"ISK"
+	JMD       = Currency{71}  // json:"JMD"
+	JOD       = Currency{72}  // json:"JOD"
+	JPY       = Currency{73}  // json:"JPY"
+	KES       = Currency{74}  // json:"KES"
+	KGS       = Currency{75}  // json:"KGS"
+	KHR       = Currency{76}  // json:"KHR"
+	KMF       = Currency{77}  // json:"KMF"
+	KPW       = Currency{78}  // json:"KPW"
+	KRW       = Currency{79}  // json:"KRW"
+	KWD       = Currency{80}  // json:"KWD"
+	KYD       = Currency{81}  // json:"KYD"
+	KZT       = Currency{82}  // json:"KZT"
+	LAK       = Currency{83}  // json:"LAK"
+	LBP       = Currency{84}  // json:"LBP"
+	LKR       = Currency{85}  // json:"LKR"
+	LRD       = Currency{86}  // json:"LRD"
+	LSL       = Currency{87}  // json:"LSL"
+	LYD       = Currency{88}  // json:"LYD"
+	MAD       = Currency{89}  // json:"MAD"
+	MDL       = Currency{90}  // json:"MDL"
+	MGA       = Currency{91}  // json:"MGA"
+	MKD       = Currency{92}  // json:"MKD"
+	MMK       = Currency{93}  // json:"MMK"
+	MNT       = Currency{94}  // json:"MNT"
+	MOP       = Currency{95}  // json:"MOP"
+	MRU       = Currency{96}  // json:"MRU"
+	MUR       = Currency{97}  // json:"MUR"
+	MVR       = Currency{98}  // json:"MVR"
+	MWK       = Currency{99}  // json:"MWK"
+	MXN       = Currency{100} // json:"MXN"
+	MXV       = Currency{101} // json:"MXV"
+	MYR       = Currency{102} // json:"MYR"
+	MZN       = Currency{103} // json:"MZN"
+	NAD       = Currency{104} // json:"NAD"
+	NGN       = Currency{105} // json:"NGN"
+	NIO       = Currency{106} // json:"NIO"
+	NOK       = Currency{107} // json:"NOK"
+	NPR       = Currency{108} // json:"NPR"
+	NZD       = Currency{109} // json:"NZD"
+	OMR       = Currency{110} // json:"OMR"
+	PAB       = Currency{111} // json:"PAB"
+	PEN       = Currency{112} // json:"PEN"
+	PGK       = Currency{113} // json:"PGK"
+	PHP       = Currency{114} // json:"PHP"
+	PKR       = Currency{115} // json:"PKR"
+	PLN       = Currency{116} // json:"PLN"
+	PYG       = Currency{117} // json:"PYG"
+	QAR       = Currency{118} // json:"QAR"
+	RON       = Currency{119} // json:"RON"
+	RSD       = Currency{120} // json:"RSD"
+	RUB       = Currency{121} // json:"RUB"
+	RWF       = Currency{122} // json:"RWF"
+	SAR       = Currency{123} // json:"SAR"
+	SBD       = Currency{124} // json:"SBD"
+	SCR       = Currency{125} // json:"SCR"
+	SDG       = Currency{126} // json:"SDG"
+	SEK       = Currency{127} // json:"SEK"
+	SGD       = Currency{128} // json:"SGD"
+	SHP       = Currency{129} // json:"SHP"
+	SLE       = Currency{130} // json:"SLE"
+	SLL       = Currency{131} // json:"SLL"
+	SOS       = Currency{132} // json:"SOS"
+	SRD       = Currency{133} // json:"SRD"
+	SSP       = Currency{134} // json:"SSP"
+	STN       = Currency{135} // json:"STN"
+	SVC       = Currency{136} // json:"SVC"
+	SYP       = Currency{137} // json:"SYP"
+	SZL       = Currency{138} // json:"SZL"
+	THB       = Currency{139} // json:"THB"
+	TJS       = Currency{140} // json:"TJS"
+	TMT       = Currency{141} // json:"TMT"
+	TND       = Currency{142} // json:"TND"
+	TOP       = Currency{143} // json:"TOP"
+	TRY       = Currency{144} // json:"TRY"
+	TTD       = Currency{145} // json:"TTD"
+	TWD       = Currency{146} // json:"TWD"
+	TZS       = Currency{147} // json:"TZS"
+	UAH       = Currency{148} // json:"UAH"
+	UGX       = Currency{149} // json:"UGX"
+	USD       = Currency{150} // json:"USD"
+	USN       = Currency{151} // json:"USN"
+	UYI       = Currency{152} // json:"UYI"
+	UYU       = Currency{153} // json:"UYU"
+	UYW       = Currency{154} // json:"UYW"
+	UZS       = Currency{155} // json:"UZS"
+	VED       = Currency{156} // json:"VED"
+	VES       = Currency{157} // json:"VES"
+	VND       = Currency{158} // json:"VND"
+	VUV       = Currency{159} // json:"VUV"
+	WST       = Currency{160} // json:"WST"
+	XAF       = Currency{161} // json:"XAF"
+	XAG       = Currency{162} // json:"XAG"
+	XAU       = Currency{163} // json:"XAU"
+	XBA       = Currency{164} // json:"XBA"
+	XBB       = Currency{165} // json:"XBB"
+	XBC       = Currency{166} // json:"XBC"
+	XBD       = Currency{167} // json:"XBD"
+	XCD       = Currency{168} // json:"XCD"
+	XDR       = Currency{169} // json:"XDR"
+	XOF       = Currency{170} // json:"XOF"
+	XPD       = Currency{171} // json:"XPD"
+	XPF       = Currency{172} // json:"XPF"
+	XPT       = Currency{173} // json:"XPT"
+	XSU       = Currency{174} // json:"XSU"
+	XTS       = Currency{175} // json:"XTS"
+	XUA       = Currency{176} // json:"XUA"
+	XXX       = Currency{177} // json:"XXX"
+	YER       = Currency{178} // json:"YER"
+	ZAR       = Currency{179} // json:"ZAR"
+	ZMW       = Currency{180} // json:"ZMW"
+	ZWL       = Currency{181} // json:"ZWL"
+)
