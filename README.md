@@ -13,12 +13,11 @@
 > _**Be Precise:** using floats to represent currency is almost criminal. — Robert.C.Martin, "Clean Code" p.301_
 
 * as fast as `int64`
-* no `float` in parsing nor printing
+* no `float` in parsing nor printing, does not leak precision
 * `ISO 4217` currency
 * block mismatched currency arithmetics
-* does not leak precision
-* parsing faster than `int`, `float`, `string`
 * 100 LOC
+* fuzz tests
 
 ```go
 var BuySP500Price = fpmoney.Amount{Amount: fpdecimal.FromInt(9000), Currency: fpmoney.SGD}
@@ -42,22 +41,6 @@ json.NewEncoder(os.Stdout).Encode(amountToBuy)
 // Output: {"amount":18000.04,"currency":"SGD"}
 ```
 
-### Division
-
-Division always returns remainder.
-Fractional cents can never be reached.
-
-```go
-x := fpmoney.Amount{Amount: fpdecimal.FromInt(1), Currency: fpmoney.SGD}
-a, r := x.Div(3)
-enc := json.NewEncoder(os.Stdout)
-enc.Encode(a)
-enc.Encode(r)
-// Output:
-// {"amount":0.3333,"currency":"SGD"}
-// {"amount":0.0001,"currency":"SGD"}
-```
-
 ### Ultra Small Fractions
 
 Some denominations have very low fractions.
@@ -65,10 +48,6 @@ Storing them `int64` you would get.
 
 - `BTC` _satoshi_ is `1 BTC = 100,000,000 satoshi`, which is still enough for ~`92,233,720,368 BTC`.
 - `ETH` _wei_ is `1 ETH = 1,000,000,000,000,000,000 wei`, which is ~`9 ETH`. If you deal with _wei_, you may consider `bigint` or multiple `int64`. In fact, official Ethereum code is in Go and it is using bigint ([code](https://github.com/ethereum/go-ethereum/blob/master/params/denomination.go)).
-
-Given that currency enumn still takes at least 1B in separate storage from `int64` in struct and Go allocates 16B of memory for struct regardless, current implementation reserved padding bytes.
-It is sensible to use extra space our ot 16B to support long integer arithmetics.
-Implementing this is area of furthter research.
 
 ### Benchmarks
 
@@ -94,6 +73,16 @@ JSONUnmarshal/small-16       6.00 ± 0%      6.00 ± 0%      5.00 ± 0%
 JSONUnmarshal/large-16       6.00 ± 0%      6.00 ± 0%      5.00 ± 0%
 JSONMarshal/small-16         2.00 ± 0%      2.00 ± 0%      3.00 ± 0%
 JSONMarshal/large-16         2.00 ± 0%      2.00 ± 0%      3.00 ± 0%
+```
+
+```bash
+goos: darwin
+goarch: arm64
+pkg: github.com/nikolaydubina/fpmoney
+BenchmarkArithmetic/add_x1-16         1000000000	         0.41 ns/op	       0 B/op	       0 allocs/op
+BenchmarkArithmetic/add_x100-16       	30528880	        40.13 ns/op	       0 B/op	       0 allocs/op
+PASS
+ok  	github.com/nikolaydubina/fpmoney	14.200s
 ```
 
 ## References and Related Work
