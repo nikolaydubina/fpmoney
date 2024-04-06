@@ -30,8 +30,8 @@ jobs:
 
       - name: Fuzz
         run: |
-          go test -fuzz=FuzzArithmetics .
-          go test -fuzz=FuzzJSON_MarshalUnmarshal .
+          go test -fuzztime=5s -fuzz=FuzzArithmetics .
+          go test -fuzztime=5s -fuzz=FuzzJSON_MarshalUnmarshal .
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v2
