@@ -76,24 +76,33 @@ func ExampleFromFloat() {
 	// Output: 144.96 SGD
 }
 
-func TestScaled(t *testing.T) {
-	data := []struct {
-		a        fpmoney.Amount
-		expected int64
-	}{
-		{fpmoney.FromIntScaled(17, fpmoney.EUR), 17},
-		{fpmoney.FromFloat(23.0, fpmoney.EUR), 2300},
-		{fpmoney.FromFloat(42.23, fpmoney.EUR), 4223},
-		{fpmoney.FromFloat(17.0, fpmoney.CLF), 170000},
-		{fpmoney.FromFloat(8764534896.42, fpmoney.USD), 876453489642},
-	}
+func ExampleAmount_Scaled_fractions() {
+	v := fpmoney.FromFloat(42.23, fpmoney.EUR)
+	fmt.Println(v.Scaled())
+	// Output: 4223
+}
 
-	for _, d := range data {
-		res := d.a.Scaled()
-		if res != d.expected {
-			t.Errorf("%v: expected: %d, got: %d", d, d.expected, res)
-		}
-	}
+func ExampleAmount_Scaled_many_fractions() {
+	v := fpmoney.FromFloat(17.0, fpmoney.CLF)
+	fmt.Println(v.Scaled())
+	// Output: 170000
+}
+
+func ExampleAmount_Scaled_large() {
+	v := fpmoney.FromFloat(8764534896.42, fpmoney.USD)
+	fmt.Println(v.Scaled())
+	// Output: 876453489642
+}
+func ExampleAmount_Scaled_whole() {
+	v := fpmoney.FromFloat(23.0, fpmoney.EUR)
+	fmt.Println(v.Scaled())
+	// Output: 2300
+}
+
+func ExampleAmount_Scaled_from_scaled() {
+	v := fpmoney.FromIntScaled(17, fpmoney.EUR)
+	fmt.Println(v.Scaled())
+	// Output: 17
 }
 
 func FuzzArithmetics(f *testing.F) {
