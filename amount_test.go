@@ -1,4 +1,4 @@
-package fpmoney_test
+package fpmoney
 
 import (
 	_ "embed"
@@ -9,24 +9,22 @@ import (
 	"strconv"
 	"strings"
 	"testing"
-
-	"github.com/nikolaydubina/fpmoney"
 )
 
 func ExampleAmount() {
-	var BuySP500Price = fpmoney.FromInt(9000, fpmoney.SGD)
+	var BuySP500Price = FromInt(9000, SGD)
 
 	input := []byte(`{"sp500": {"amount": 9000.02, "currency": "SGD"}}`)
 
 	type Stonks struct {
-		SP500 fpmoney.Amount `json:"sp500"`
+		SP500 Amount `json:"sp500"`
 	}
 	var v Stonks
 	if err := json.Unmarshal(input, &v); err != nil {
 		log.Fatal(err)
 	}
 
-	amountToBuy := fpmoney.FromInt(0, fpmoney.SGD)
+	amountToBuy := FromInt(0, SGD)
 	if v.SP500.GreaterThan(BuySP500Price) {
 		amountToBuy = amountToBuy.Add(v.SP500.Mul(2))
 	}
@@ -36,52 +34,72 @@ func ExampleAmount() {
 }
 
 func ExampleAmount_Div_part() {
-	x := fpmoney.FromInt(1, fpmoney.SGD)
+	x := FromInt(1, SGD)
 	a, r := x.Div(3)
 	fmt.Println(a, r)
 	// Output: 0.33 SGD 0.01 SGD
 }
 
 func ExampleAmount_Div_whole() {
-	x := fpmoney.FromInt(1, fpmoney.SGD)
+	x := FromInt(1, SGD)
 	a, r := x.Div(5)
 	fmt.Println(a, r)
 	// Output: 0.2 SGD 0 SGD
 }
 
 func ExampleAmount_equality() {
-	x := fpmoney.FromInt(3, fpmoney.SGD)
-	y := fpmoney.FromInt(9, fpmoney.SGD)
+	x := FromInt(3, SGD)
+	y := FromInt(9, SGD)
 	fmt.Println(y == x.Mul(3))
 	// Output: true
 }
 
 func ExampleAmount_equality_same_currency() {
-	x := fpmoney.FromInt(10, fpmoney.SGD)
-	y := fpmoney.FromInt(10, fpmoney.SGD)
+	x := FromInt(10, SGD)
+	y := FromInt(10, SGD)
 	fmt.Println(y == x)
 	// Output: true
 }
 
 func ExampleAmount_equality_wrong_currency() {
-	x := fpmoney.FromInt(10, fpmoney.USD)
-	y := fpmoney.FromInt(10, fpmoney.SGD)
+	x := FromInt(10, USD)
+	y := FromInt(10, SGD)
 	fmt.Println(y == x)
 	// Output: false
 }
 
 func ExampleFromFloat() {
-	x := fpmoney.FromFloat(144.96, fpmoney.SGD)
+	x := FromFloat(144.96, SGD)
 	fmt.Println(x)
 	// Output: 144.96 SGD
 }
 
+func TestScaled(t *testing.T) {
+	data := []struct {
+		a        Amount
+		expected int64
+	}{
+		{FromIntScaled(17, EUR), 17},
+		{FromFloat(23.0, EUR), 2300},
+		{fromJSONOrDie(`{"amount": 42.23, currency: "EUR"}`), 4223},
+		{fromJSONOrDie(`{"amount": 17, currency: "CLF"}`), 170000},
+		{fromJSONOrDie(`{"amount": 8764534896.42, currency: "USD"}`), 876453489642},
+	}
+
+	for _, d := range data {
+		res := d.a.Scaled()
+		if res != d.expected {
+			t.Errorf("%v: expected: %d, got: %d", d, d.expected, res)
+		}
+	}
+}
+
 func FuzzArithmetics(f *testing.F) {
-	currencies := [...]fpmoney.Currency{
-		fpmoney.KRW,
-		fpmoney.SGD,
-		fpmoney.BHD,
-		fpmoney.CLF,
+	currencies := [...]Currency{
+		KRW,
+		SGD,
+		BHD,
+		CLF,
 	}
 
 	tests := [][2]int64{
@@ -101,26 +119,26 @@ func FuzzArithmetics(f *testing.F) {
 		}
 		currency := currencies[c]
 
-		fa := fpmoney.FromIntScaled(a, currency)
-		fb := fpmoney.FromIntScaled(b, currency)
+		fa := FromIntScaled(a, currency)
+		fb := FromIntScaled(b, currency)
 
 		v := []bool{
 			// sum commutativity
 			fa.Add(fb) == fb.Add(fa),
 
 			// sum associativity
-			fpmoney.FromInt(0, currency).Add(fa).Add(fb).Add(fa) == fpmoney.FromInt(0, currency).Add(fb).Add(fa).Add(fa),
+			FromInt(0, currency).Add(fa).Add(fb).Add(fa) == FromInt(0, currency).Add(fb).Add(fa).Add(fa),
 
 			// sum zero
 			fa == fa.Add(fb).Sub(fb),
 			fa == fa.Sub(fb).Add(fb),
-			fpmoney.FromInt(0, currency) == fpmoney.FromInt(0, currency).Add(fa).Sub(fa),
+			FromInt(0, currency) == FromInt(0, currency).Add(fa).Sub(fa),
 
 			// product identity
 			fa == fa.Mul(1),
 
 			// product zero
-			fpmoney.FromInt(0, currency) == fa.Mul(0),
+			FromInt(0, currency) == fa.Mul(0),
 
 			// match number
 			(a == b) == (fa == fb),
@@ -130,8 +148,8 @@ func FuzzArithmetics(f *testing.F) {
 			a >= b == fa.GreaterThanOrEqual(fb),
 
 			// match number convert
-			fpmoney.FromIntScaled(a+b, currency) == fa.Add(fb),
-			fpmoney.FromIntScaled(a-b, currency) == fa.Sub(fb),
+			FromIntScaled(a+b, currency) == fa.Add(fb),
+			FromIntScaled(a-b, currency) == fa.Sub(fb),
 		}
 		for i, q := range v {
 			if !q {
@@ -141,10 +159,10 @@ func FuzzArithmetics(f *testing.F) {
 
 		if b != 0 {
 			w, r := fa.Div(int(b))
-			if w != fpmoney.FromIntScaled(a/b, currency) {
+			if w != FromIntScaled(a/b, currency) {
 				t.Error(w, a/b, a, b, fa)
 			}
-			if r != fpmoney.FromIntScaled(a%b, currency) {
+			if r != FromIntScaled(a%b, currency) {
 				t.Error(r, a%b, a, b, fa)
 			}
 		}
@@ -152,11 +170,11 @@ func FuzzArithmetics(f *testing.F) {
 }
 
 func FuzzJSONUnmarshal_Float(f *testing.F) {
-	currencies := [...]fpmoney.Currency{
-		fpmoney.KRW,
-		fpmoney.SGD,
-		fpmoney.BHD,
-		fpmoney.CLF,
+	currencies := [...]Currency{
+		KRW,
+		SGD,
+		BHD,
+		CLF,
 	}
 
 	tests := []float32{
@@ -211,7 +229,7 @@ func FuzzJSONUnmarshal_Float(f *testing.F) {
 			t.Skip()
 		}
 
-		var x fpmoney.Amount
+		var x Amount
 		if err := json.Unmarshal([]byte(s), &x); err != nil {
 			t.Error(rs, currency, err)
 		}
@@ -270,10 +288,10 @@ func FuzzJSONUnmarshal_NoPanic(f *testing.F) {
 	f.Add(`{"amount":,"currency":""}`)
 
 	f.Fuzz(func(t *testing.T, s string) {
-		var x fpmoney.Amount
+		var x Amount
 		err := json.Unmarshal([]byte(s), &x)
 		if err != nil {
-			if (x != fpmoney.Amount{}) {
+			if (x != Amount{}) {
 				t.Errorf("has to be 0 on error")
 			}
 			return
@@ -292,7 +310,7 @@ func FuzzToFloat(f *testing.F) {
 		f.Add(-tc)
 	}
 	f.Fuzz(func(t *testing.T, v int64) {
-		a := fpmoney.FromIntScaled(v, fpmoney.KRW)
+		a := FromIntScaled(v, KRW)
 
 		if float32(v) != a.Float32() {
 			t.Error(a, a.Float32(), float32(v))
@@ -307,49 +325,49 @@ func FuzzToFloat(f *testing.F) {
 func TestUnmarshalJSON(t *testing.T) {
 	tests := []struct {
 		s string
-		v fpmoney.Amount
+		v Amount
 	}{
 		// 2 cents
 		{
 			s: `{"currency": "SGD","amount": 9002.01}`,
-			v: fpmoney.FromIntScaled(900201, fpmoney.SGD),
+			v: FromIntScaled(900201, SGD),
 		},
 		{
 			s: `{"amount": 9002.01, "currency": "SGD"}`,
-			v: fpmoney.FromIntScaled(900201, fpmoney.SGD),
+			v: FromIntScaled(900201, SGD),
 		},
 		{
 			s: `{"amount": -9002.01, "currency": "SGD"}`,
-			v: fpmoney.FromIntScaled(-900201, fpmoney.SGD),
+			v: FromIntScaled(-900201, SGD),
 		},
 		{
 			s: `{"amount": 0, "currency": "SGD"}`,
-			v: fpmoney.FromIntScaled(0, fpmoney.SGD),
+			v: FromIntScaled(0, SGD),
 		},
 		{
 			s: `{"amount": 0.01, "currency": "SGD"}`,
-			v: fpmoney.FromIntScaled(1, fpmoney.SGD),
+			v: FromIntScaled(1, SGD),
 		},
 		{
 			s: `{"amount": -0.01, "currency": "SGD"}`,
-			v: fpmoney.FromIntScaled(-1, fpmoney.SGD),
+			v: FromIntScaled(-1, SGD),
 		},
 		// 0 cents
 		{
 			s: `{"amount":1,"currency":"KRW"}`,
-			v: fpmoney.FromIntScaled(1, fpmoney.KRW),
+			v: FromIntScaled(1, KRW),
 		},
 		{
 			s: `{"amount":-1,"currency":"KRW"}`,
-			v: fpmoney.FromIntScaled(-1, fpmoney.KRW),
+			v: FromIntScaled(-1, KRW),
 		},
 		{
 			s: `{"amount":123,"currency":"KRW"}`,
-			v: fpmoney.FromIntScaled(123, fpmoney.KRW),
+			v: FromIntScaled(123, KRW),
 		},
 		{
 			s: `{"amount":-123,"currency":"KRW"}`,
-			v: fpmoney.FromIntScaled(-123, fpmoney.KRW),
+			v: FromIntScaled(-123, KRW),
 		},
 		// 2 cents strange valid input
 		{
@@ -364,12 +382,12 @@ func TestUnmarshalJSON(t *testing.T) {
 
 
              `,
-			v: fpmoney.FromIntScaled(900201, fpmoney.SGD),
+			v: FromIntScaled(900201, SGD),
 		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.s, func(t *testing.T) {
-			var v fpmoney.Amount
+			var v Amount
 			err := json.Unmarshal([]byte(tc.s), &v)
 			if err != nil {
 				t.Error(err)
@@ -384,65 +402,65 @@ func TestUnmarshalJSON(t *testing.T) {
 func TestMarshalJSON(t *testing.T) {
 	tests := []struct {
 		s string
-		v fpmoney.Amount
+		v Amount
 	}{
 		// 2 cents
 		{
 			s: `{"amount":9002.01,"currency":"SGD"}`,
-			v: fpmoney.FromIntScaled(900201, fpmoney.SGD),
+			v: FromIntScaled(900201, SGD),
 		},
 		{
 			s: `{"amount":0,"currency":"SGD"}`,
-			v: fpmoney.FromIntScaled(0, fpmoney.SGD),
+			v: FromIntScaled(0, SGD),
 		},
 		{
 			s: `{"amount":0.01,"currency":"SGD"}`,
-			v: fpmoney.FromIntScaled(1, fpmoney.SGD),
+			v: FromIntScaled(1, SGD),
 		},
 		{
 			s: `{"amount":-0.01,"currency":"SGD"}`,
-			v: fpmoney.FromIntScaled(-1, fpmoney.SGD),
+			v: FromIntScaled(-1, SGD),
 		},
 		{
 			s: `{"amount":1.01,"currency":"SGD"}`,
-			v: fpmoney.FromIntScaled(101, fpmoney.SGD),
+			v: FromIntScaled(101, SGD),
 		},
 		{
 			s: `{"amount":-1.01,"currency":"SGD"}`,
-			v: fpmoney.FromIntScaled(-101, fpmoney.SGD),
+			v: FromIntScaled(-101, SGD),
 		},
 		{
 			s: `{"amount":1,"currency":"SGD"}`,
-			v: fpmoney.FromInt(1, fpmoney.SGD),
+			v: FromInt(1, SGD),
 		},
 		{
 			s: `{"amount":5,"currency":"SGD"}`,
-			v: fpmoney.FromInt(5, fpmoney.SGD),
+			v: FromInt(5, SGD),
 		},
 		{
 			s: `{"amount":-1,"currency":"SGD"}`,
-			v: fpmoney.FromInt(-1, fpmoney.SGD),
+			v: FromInt(-1, SGD),
 		},
 		{
 			s: `{"amount":-5,"currency":"SGD"}`,
-			v: fpmoney.FromInt(-5, fpmoney.SGD),
+			v: FromInt(-5, SGD),
 		},
 		// 0 cents
 		{
 			s: `{"amount":1,"currency":"KRW"}`,
-			v: fpmoney.FromIntScaled(1, fpmoney.KRW),
+			v: FromIntScaled(1, KRW),
 		},
 		{
 			s: `{"amount":-1,"currency":"KRW"}`,
-			v: fpmoney.FromIntScaled(-1, fpmoney.KRW),
+			v: FromIntScaled(-1, KRW),
 		},
 		{
 			s: `{"amount":123,"currency":"KRW"}`,
-			v: fpmoney.FromIntScaled(123, fpmoney.KRW),
+			v: FromIntScaled(123, KRW),
 		},
 		{
 			s: `{"amount":-123,"currency":"KRW"}`,
-			v: fpmoney.FromIntScaled(-123, fpmoney.KRW),
+			v: FromIntScaled(-123, KRW),
 		},
 	}
 	for _, tc := range tests {
@@ -459,11 +477,11 @@ func TestMarshalJSON(t *testing.T) {
 }
 
 func FuzzJSON_MarshalUnmarshal(f *testing.F) {
-	currencies := [...]fpmoney.Currency{
-		fpmoney.KRW,
-		fpmoney.SGD,
-		fpmoney.BHD,
-		fpmoney.CLF,
+	currencies := [...]Currency{
+		KRW,
+		SGD,
+		BHD,
+		CLF,
 	}
 
 	tests := []int64{
@@ -483,14 +501,14 @@ func FuzzJSON_MarshalUnmarshal(f *testing.F) {
 		}
 
 		currency := currencies[c]
-		q := fpmoney.FromIntScaled(v, currency)
+		q := FromIntScaled(v, currency)
 
 		s, err := json.Marshal(q)
 		if err != nil {
 			t.Error(err)
 		}
 
-		var x fpmoney.Amount
+		var x Amount
 		if err := json.Unmarshal(s, &x); err != nil {
 			t.Error(err, string(s))
 		}
@@ -502,8 +520,8 @@ func FuzzJSON_MarshalUnmarshal(f *testing.F) {
 }
 
 func BenchmarkArithmetic(b *testing.B) {
-	x := fpmoney.FromFloat(12312.31, fpmoney.SGD)
-	y := fpmoney.FromFloat(12.02, fpmoney.SGD)
+	x := FromFloat(12312.31, SGD)
+	y := FromFloat(12.02, SGD)
 
 	b.ResetTimer()
 	b.Run("add_x1", func(b *testing.B) {
@@ -521,7 +539,7 @@ func BenchmarkArithmetic(b *testing.B) {
 		}
 	})
 
-	if x == fpmoney.FromInt(0, fpmoney.SGD) {
+	if x == FromInt(0, SGD) {
 		b.Error()
 	}
 }
@@ -547,12 +565,12 @@ var testsFloats = []struct {
 }
 
 func BenchmarkJSONUnmarshal(b *testing.B) {
-	var s fpmoney.Amount
+	var s Amount
 	for _, tc := range testsFloats {
 		b.Run(tc.name, func(b *testing.B) {
 			for n := 0; n < b.N; n++ {
 				err := json.Unmarshal([]byte(tc.vals[n%len(tc.vals)]), &s)
-				if err != nil || s == fpmoney.FromInt(0, fpmoney.SGD) {
+				if err != nil || s == FromInt(0, SGD) {
 					b.Error(s, err)
 				}
 			}
@@ -564,9 +582,9 @@ func BenchmarkJSONMarshal(b *testing.B) {
 	var s []byte
 	var err error
 	for _, tc := range testsFloats {
-		tests := make([]fpmoney.Amount, 0, len(tc.vals))
+		tests := make([]Amount, 0, len(tc.vals))
 		for _, q := range tc.vals {
-			var x fpmoney.Amount
+			var x Amount
 			if err := json.Unmarshal([]byte(q), &x); err != nil {
 				b.Error(err)
 			}
@@ -593,9 +611,9 @@ func BenchmarkJSONMarshal_Exact(b *testing.B) {
 	var s []byte
 	var err error
 	for _, tc := range testsFloats {
-		tests := make([]fpmoney.Amount, 0, len(tc.vals))
+		tests := make([]Amount, 0, len(tc.vals))
 		for _, q := range tc.vals {
-			var x fpmoney.Amount
+			var x Amount
 			if err := json.Unmarshal([]byte(q), &x); err != nil {
 				b.Error(err)
 			}
@@ -620,46 +638,46 @@ func BenchmarkJSONMarshal_Exact(b *testing.B) {
 
 func TestArithmetic_WrongCurrency(t *testing.T) {
 	tests := []struct {
-		a fpmoney.Amount
-		b fpmoney.Amount
-		f func(a, b fpmoney.Amount)
-		e *fpmoney.ErrCurrencyMismatch
+		a Amount
+		b Amount
+		f func(a, b Amount)
+		e *ErrCurrencyMismatch
 	}{
 		{
-			a: fpmoney.FromInt(10, fpmoney.SGD),
-			b: fpmoney.FromInt(11, fpmoney.USD),
-			f: func(a, b fpmoney.Amount) { a.Add(b) },
-			e: &fpmoney.ErrCurrencyMismatch{A: fpmoney.SGD, B: fpmoney.USD},
+			a: FromInt(10, SGD),
+			b: FromInt(11, USD),
+			f: func(a, b Amount) { a.Add(b) },
+			e: &ErrCurrencyMismatch{A: SGD, B: USD},
 		},
 		{
-			a: fpmoney.FromInt(10, fpmoney.SGD),
-			b: fpmoney.FromInt(11, fpmoney.USD),
-			f: func(a, b fpmoney.Amount) { a.Sub(b) },
-			e: &fpmoney.ErrCurrencyMismatch{A: fpmoney.SGD, B: fpmoney.USD},
+			a: FromInt(10, SGD),
+			b: FromInt(11, USD),
+			f: func(a, b Amount) { a.Sub(b) },
+			e: &ErrCurrencyMismatch{A: SGD, B: USD},
 		},
 		{
-			a: fpmoney.FromInt(10, fpmoney.SGD),
-			b: fpmoney.FromInt(11, fpmoney.USD),
-			f: func(a, b fpmoney.Amount) { a.LessThan(b) },
-			e: &fpmoney.ErrCurrencyMismatch{A: fpmoney.SGD, B: fpmoney.USD},
+			a: FromInt(10, SGD),
+			b: FromInt(11, USD),
+			f: func(a, b Amount) { a.LessThan(b) },
+			e: &ErrCurrencyMismatch{A: SGD, B: USD},
 		},
 		{
-			a: fpmoney.FromInt(10, fpmoney.SGD),
-			b: fpmoney.FromInt(11, fpmoney.USD),
-			f: func(a, b fpmoney.Amount) { a.LessThanOrEqual(b) },
-			e: &fpmoney.ErrCurrencyMismatch{A: fpmoney.SGD, B: fpmoney.USD},
+			a: FromInt(10, SGD),
+			b: FromInt(11, USD),
+			f: func(a, b Amount) { a.LessThanOrEqual(b) },
+			e: &ErrCurrencyMismatch{A: SGD, B: USD},
 		},
 		{
-			a: fpmoney.FromInt(10, fpmoney.SGD),
-			b: fpmoney.FromInt(11, fpmoney.USD),
-			f: func(a, b fpmoney.Amount) { a.GreaterThan(b) },
-			e: &fpmoney.ErrCurrencyMismatch{A: fpmoney.SGD, B: fpmoney.USD},
+			a: FromInt(10, SGD),
+			b: FromInt(11, USD),
+			f: func(a, b Amount) { a.GreaterThan(b) },
+			e: &ErrCurrencyMismatch{A: SGD, B: USD},
 		},
 		{
-			a: fpmoney.FromInt(10, fpmoney.SGD),
-			b: fpmoney.FromInt(11, fpmoney.USD),
-			f: func(a, b fpmoney.Amount) { a.GreaterThanOrEqual(b) },
-			e: &fpmoney.ErrCurrencyMismatch{A: fpmoney.SGD, B: fpmoney.USD},
+			a: FromInt(10, SGD),
+			b: FromInt(11, USD),
+			f: func(a, b Amount) { a.GreaterThanOrEqual(b) },
+			e: &ErrCurrencyMismatch{A: SGD, B: USD},
 		},
 	}
 	for i, tc := range tests {
@@ -670,7 +688,7 @@ func TestArithmetic_WrongCurrency(t *testing.T) {
 				if !ok {
 					t.Error(r)
 				}
-				if err := fpmoney.NewErrCurrencyMismatch(); !errors.As(re, &err) || *err != *tc.e {
+				if err := NewErrCurrencyMismatch(); !errors.As(re, &err) || *err != *tc.e {
 					t.Error(re, tc.e)
 				}
 			}()
@@ -681,9 +699,17 @@ func TestArithmetic_WrongCurrency(t *testing.T) {
 
 func TestErrCurrencyMismatch_Error(t *testing.T) {
 	t.Run("error", func(t *testing.T) {
-		e := &fpmoney.ErrCurrencyMismatch{A: fpmoney.SGD, B: fpmoney.USD}
+		e := &ErrCurrencyMismatch{A: SGD, B: USD}
 		if e.Error() != "SGD != USD" {
 			t.Error(e)
 		}
 	})
+}
+
+func fromJSONOrDie(json string) Amount {
+	var a Amount
+	if err := a.UnmarshalJSON([]byte(json)); err != nil {
+		panic(err)
+	}
+	return a
 }
