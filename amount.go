@@ -35,6 +35,8 @@ func (a Amount) Float64() float64 { return float64(a.v) / float64(a.c.scale()) }
 
 func (a Amount) Currency() Currency { return a.c }
 
+func (a Amount) Scaled() int64 { return a.v }
+
 func (a Amount) Add(b Amount) Amount {
 	checkCurrency(a.c, b.c)
 	return Amount{v: a.v + b.v, c: a.c}
