@@ -17,11 +17,6 @@ func (c Currency) Exponent() uint8 {
 	}
 }
 
-func (c Currency) String() string {
-	s, _ := c.MarshalText()
-	return string(s)
-}
-
 func (c Currency) scale() int64 {
 	switch c.Exponent() {
 	case 3:
@@ -33,7 +28,7 @@ func (c Currency) scale() int64 {
 	}
 }
 
-//go:generate go run github.com/nikolaydubina/go-enum-encoding@latest -type=Currency
+//go:generate go run github.com/nikolaydubina/go-enum-encoding@latest -type=Currency -string
 const (
 	UndefinedCurrency Currency = iota //
 	AED                               // json:"AED"
