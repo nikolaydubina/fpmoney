@@ -14,10 +14,8 @@
 
 * as fast as `int64`
 * no `float` in parsing nor printing, does not leak precision
-* `ISO 4217` currency
+* `ISO 4217`[^1][^2] currency
 * block mismatched currency arithmetics
-* 100 LOC
-* fuzz tests
 
 ```go
 var BuySP500Price = fpmoney.FromInt(9000, fpmoney.SGD)
@@ -91,3 +89,7 @@ ok  	github.com/nikolaydubina/fpmoney	14.200s
 - `github.com/shopspring/decimal`: fixed precision; faster printing/parsing/arithmetics; currency handling 
 - `github.com/Rhymond/go-money`: does not use `float` or `interface{}` in parsing; currency is enum
 - `github.com/ferdypruis/iso4217`: skipped deprecated currencies to fit into `uint8` and smaller struct size
+- https://en.wikipedia.org/wiki/ISO_4217
+
+[^1]: excluding currencies with 4+ minor units `CLF`, `UYW`
+[^2]: excluding deprecated currencies `HRD`, `HRK`, `SLL`, `ZWL`
