@@ -1,6 +1,8 @@
 package fpmoney
 
 import (
+	"errors"
+
 	"github.com/nikolaydubina/fpdecimal"
 )
 
@@ -75,7 +77,7 @@ func checkCurrency(a, b Currency) {
 
 func (a Amount) Mul(b int) Amount { return Amount{v: a.v * int64(b), c: a.c} }
 
-func (a Amount) Div(b int) (part Amount, remainder Amount) {
+func (a Amount) DivMod(b int) (part Amount, remainder Amount) {
 	return Amount{v: a.v / int64(b), c: a.c}, Amount{v: a.v % int64(b), c: a.c}
 }
 
@@ -108,12 +110,12 @@ func (a *Amount) UnmarshalJSON(b []byte) (err error) {
 			for ; i < len(b) && b[i] != '"'; i++ {
 			}
 			if i == len(b) {
-				return &ErrWrongCurrencyString{}
+				return ErrWrongCurrencyString
 			}
 			i++ // opening `"`
 			e = i + lenISO427Currency
 			if e > len(b) {
-				return &ErrWrongCurrencyString{}
+				return ErrWrongCurrencyString
 			}
 
 			if err := a.c.UnmarshalText(b[i:e]); err != nil {
@@ -155,6 +157,8 @@ func (a Amount) MarshalJSON() ([]byte, error) {
 	return b, nil
 }
 
+var ErrWrongCurrencyString = errors.New("wrong currency string")
+
 type ErrCurrencyMismatch struct {
 	A, B Currency
 }
@@ -162,9 +166,3 @@ type ErrCurrencyMismatch struct {
 func NewErrCurrencyMismatch() *ErrCurrencyMismatch { return &ErrCurrencyMismatch{} }
 
 func (e *ErrCurrencyMismatch) Error() string { return e.A.String() + " != " + e.B.String() }
-
-type ErrWrongCurrencyString struct{}
-
-func NewErrWrongCurrencyString() *ErrWrongCurrencyString { return &ErrWrongCurrencyString{} }
-
-func (e *ErrWrongCurrencyString) Error() string { return "wrong currency string" }

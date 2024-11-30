@@ -27,6 +27,9 @@ jobs:
           go install github.com/jstemmer/go-junit-report/v2@latest
           go test -coverprofile=coverage.out -covermode=atomic -cover -json -v ./... 2>&1 | go-junit-report -set-exit-code > tests.xml
 
+      - name: Fuzz
+        run: go test -list . | grep Fuzz | xargs -P 8 -I {} go test -fuzz {} -fuzztime 5s .
+
       - name: Upload test results to Codecov
         uses: codecov/test-results-action@v1
         with:

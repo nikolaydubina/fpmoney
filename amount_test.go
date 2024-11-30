@@ -35,16 +35,16 @@ func ExampleAmount() {
 	// Output: 18000.04 SGD
 }
 
-func ExampleAmount_Div_part() {
+func ExampleAmount_DivMod_part() {
 	x := fpmoney.FromInt(1, fpmoney.SGD)
-	a, r := x.Div(3)
+	a, r := x.DivMod(3)
 	fmt.Println(a, r)
 	// Output: 0.33 SGD 0.01 SGD
 }
 
-func ExampleAmount_Div_whole() {
+func ExampleAmount_DivMod_whole() {
 	x := fpmoney.FromInt(1, fpmoney.SGD)
-	a, r := x.Div(5)
+	a, r := x.DivMod(5)
 	fmt.Println(a, r)
 	// Output: 0.2 SGD 0 SGD
 }
@@ -83,9 +83,9 @@ func ExampleAmount_Scaled_fractions() {
 }
 
 func ExampleAmount_Scaled_many_fractions() {
-	v := fpmoney.FromFloat(17.0, fpmoney.CLF)
+	v := fpmoney.FromFloat(17.0, fpmoney.BHD)
 	fmt.Println(v.Scaled())
-	// Output: 170000
+	// Output: 17000
 }
 
 func ExampleAmount_Scaled_large() {
@@ -110,7 +110,6 @@ func FuzzArithmetics(f *testing.F) {
 		fpmoney.KRW,
 		fpmoney.SGD,
 		fpmoney.BHD,
-		fpmoney.CLF,
 	}
 
 	tests := [][2]int64{
@@ -169,7 +168,7 @@ func FuzzArithmetics(f *testing.F) {
 		}
 
 		if b != 0 {
-			w, r := fa.Div(int(b))
+			w, r := fa.DivMod(int(b))
 			if w != fpmoney.FromIntScaled(a/b, currency) {
 				t.Error(w, a/b, a, b, fa)
 			}
@@ -185,7 +184,6 @@ func FuzzJSONUnmarshal_Float(f *testing.F) {
 		fpmoney.KRW,
 		fpmoney.SGD,
 		fpmoney.BHD,
-		fpmoney.CLF,
 	}
 
 	tests := []float32{
@@ -492,7 +490,6 @@ func FuzzJSON_MarshalUnmarshal(f *testing.F) {
 		fpmoney.KRW,
 		fpmoney.SGD,
 		fpmoney.BHD,
-		fpmoney.CLF,
 	}
 
 	tests := []int64{
