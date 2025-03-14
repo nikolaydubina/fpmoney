@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"math/rand"
 	"strconv"
 	"strings"
 	"testing"
@@ -528,28 +529,14 @@ func FuzzJSON_MarshalUnmarshal(f *testing.F) {
 }
 
 func BenchmarkArithmetic(b *testing.B) {
-	x := fpmoney.FromFloat(12312.31, fpmoney.SGD)
-	y := fpmoney.FromFloat(12.02, fpmoney.SGD)
+	x := fpmoney.FromFloat(rand.Float32(), fpmoney.SGD)
+	y := fpmoney.FromFloat(rand.Float32(), fpmoney.SGD)
 
-	b.ResetTimer()
-	b.Run("add_x1", func(b *testing.B) {
-		for n := 0; n < b.N; n++ {
-			x = x.Add(y)
+	b.Run("add", func(b *testing.B) {
+		for b.Loop() {
+			x.Add(y)
 		}
 	})
-
-	b.ResetTimer()
-	b.Run("add_x100", func(b *testing.B) {
-		for n := 0; n < b.N; n++ {
-			for i := 0; i < 100; i++ {
-				x = x.Add(y)
-			}
-		}
-	})
-
-	if x == fpmoney.FromInt(0, fpmoney.SGD) {
-		b.Error()
-	}
 }
 
 //go:embed testdata/amount-float-large.jsonl
@@ -572,74 +559,35 @@ var testsFloats = []struct {
 	},
 }
 
-func BenchmarkJSONUnmarshal(b *testing.B) {
-	var s fpmoney.Amount
+func BenchmarkJSON(b *testing.B) {
 	for _, tc := range testsFloats {
 		b.Run(tc.name, func(b *testing.B) {
-			for n := 0; n < b.N; n++ {
-				err := json.Unmarshal([]byte(tc.vals[n%len(tc.vals)]), &s)
-				if err != nil || s == fpmoney.FromInt(0, fpmoney.SGD) {
-					b.Error(s, err)
-				}
-			}
-		})
-	}
-}
-
-func BenchmarkJSONMarshal(b *testing.B) {
-	var s []byte
-	var err error
-	for _, tc := range testsFloats {
-		tests := make([]fpmoney.Amount, 0, len(tc.vals))
-		for _, q := range tc.vals {
-			var x fpmoney.Amount
-			if err := json.Unmarshal([]byte(q), &x); err != nil {
-				b.Error(err)
-			}
-			tests = append(tests, x)
-			tests = append(tests, x.Mul(-1))
-		}
-
-		b.ResetTimer()
-		b.Run(tc.name, func(b *testing.B) {
-			for n := 0; n < b.N; n++ {
-				s, err = json.Marshal(tests[n%len(tc.vals)])
-				if err != nil {
+			tests := make([]fpmoney.Amount, 0, len(tc.vals))
+			for _, q := range tc.vals {
+				var x fpmoney.Amount
+				if err := json.Unmarshal([]byte(q), &x); err != nil {
 					b.Error(err)
 				}
-				if string(s) == "" {
-					b.Error("empty str")
-				}
+				tests = append(tests, x)
+				tests = append(tests, x.Mul(-1))
 			}
-		})
-	}
-}
 
-func BenchmarkJSONMarshal_Exact(b *testing.B) {
-	var s []byte
-	var err error
-	for _, tc := range testsFloats {
-		tests := make([]fpmoney.Amount, 0, len(tc.vals))
-		for _, q := range tc.vals {
-			var x fpmoney.Amount
-			if err := json.Unmarshal([]byte(q), &x); err != nil {
-				b.Error(err)
-			}
-			tests = append(tests, x)
-			tests = append(tests, x.Mul(-1))
-		}
+			b.Run("encode", func(b *testing.B) {
+				v := tests[rand.Intn(len(tests))]
 
-		b.ResetTimer()
-		b.Run(tc.name, func(b *testing.B) {
-			for n := 0; n < b.N; n++ {
-				s, err = tests[n%len(tc.vals)].MarshalJSON()
-				if err != nil {
-					b.Error(err)
+				for b.Loop() {
+					_, _ = json.Marshal(v)
 				}
-				if string(s) == "" {
-					b.Error("empty str")
+			})
+
+			b.Run("decode", func(b *testing.B) {
+				var s fpmoney.Amount
+				v := []byte(tc.vals[rand.Intn(len(tc.vals))])
+
+				for b.Loop() {
+					json.Unmarshal(v, &s)
 				}
-			}
+			})
 		})
 	}
 }

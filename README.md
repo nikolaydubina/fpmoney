@@ -57,54 +57,17 @@ goos: darwin
 goarch: arm64
 pkg: github.com/nikolaydubina/fpmoney
 cpu: Apple M3 Max
-BenchmarkCurrency_UnmarshalText-16      600347949                1.888 ns/op           0 B/op          0 allocs/op
-BenchmarkCurrency_AppendText-16         448143426                2.676 ns/op           0 B/op          0 allocs/op
-BenchmarkCurrency_MarshalText-16        92917315                13.04 ns/op            8 B/op          1 allocs/op
-BenchmarkCurrency_String-16             1000000000               1.083 ns/op           0 B/op          0 allocs/op
-BenchmarkArithmetic/add_x1-16           1000000000               0.5428 ns/op          0 B/op          0 allocs/op
-BenchmarkArithmetic/add_x100-16         27640482                43.61 ns/op            0 B/op          0 allocs/op
-BenchmarkJSONUnmarshal/small-16          4501581               263.8 ns/op           198 B/op          3 allocs/op
-BenchmarkJSONUnmarshal/large-16          3550576               340.2 ns/op           216 B/op          3 allocs/op
-BenchmarkJSONMarshal/small-16            5897948               197.3 ns/op           160 B/op          3 allocs/op
-BenchmarkJSONMarshal/large-16            4855674               246.4 ns/op           176 B/op          3 allocs/op
-BenchmarkJSONMarshal_Exact/small-16     48828040                24.41 ns/op          112 B/op          1 allocs/op
-BenchmarkJSONMarshal_Exact/large-16     34155758                34.09 ns/op          112 B/op          1 allocs/op
+BenchmarkCurrency_UnmarshalText-16      510934713                2.213 ns/op           0 B/op          0 allocs/op
+BenchmarkCurrency_AppendText-16         439866170                2.714 ns/op           0 B/op          0 allocs/op
+BenchmarkCurrency_MarshalText-16        88133492                13.52 ns/op            8 B/op          1 allocs/op
+BenchmarkCurrency_String-16             1000000000               1.078 ns/op           0 B/op          0 allocs/op
+BenchmarkArithmetic/add-16              901921378                1.562 ns/op           0 B/op          0 allocs/op
+BenchmarkJSON/small/encode-16            5652006               211.6 ns/op           160 B/op          3 allocs/op
+BenchmarkJSON/small/decode-16            4993570               236.0 ns/op           152 B/op          2 allocs/op
+BenchmarkJSON/large/encode-16            4835323               246.9 ns/op           176 B/op          3 allocs/op
+BenchmarkJSON/large/decode-16            3946946               304.9 ns/op           152 B/op          2 allocs/op
 PASS
-ok      github.com/nikolaydubina/fpmoney        15.160s
-```
-
-```bash
-$ go test -bench=. -benchmem . > fpmoney.bench
-$ go test -bench=. -benchmem ./internal/bench/float32 > float32.bench
-$ go test -bench=. -benchmem ./internal/bench/int > int.bench
-$ benchstat -split="XYZ" int.bench float32.bench fpmoney.bench
-name \ time/op              int.bench   float32.bench  fpmoney.bench
-JSONUnmarshal/small-16      383ns ± 0%     408ns ± 0%     294ns ± 0%
-JSONUnmarshal/large-16      436ns ± 0%     473ns ± 0%     365ns ± 0%
-JSONMarshal/small-16        115ns ± 0%     158ns ± 0%     226ns ± 0%
-JSONMarshal/large-16        112ns ± 0%     146ns ± 0%     272ns ± 0%
-
-name \ alloc/op             int.bench   float32.bench  fpmoney.bench
-JSONUnmarshal/small-16       268B ± 0%      270B ± 0%      198B ± 0%
-JSONUnmarshal/large-16       272B ± 0%      288B ± 0%      216B ± 0%
-JSONMarshal/small-16        57.0B ± 0%     66.0B ± 0%    160.0B ± 0%
-JSONMarshal/large-16        72.0B ± 0%     72.0B ± 0%    176.0B ± 0%
-
-name \ allocs/op            int.bench   float32.bench  fpmoney.bench
-JSONUnmarshal/small-16       6.00 ± 0%      6.00 ± 0%      3.00 ± 0%
-JSONUnmarshal/large-16       6.00 ± 0%      6.00 ± 0%      3.00 ± 0%
-JSONMarshal/small-16         2.00 ± 0%      2.00 ± 0%      3.00 ± 0%
-JSONMarshal/large-16         2.00 ± 0%      2.00 ± 0%      3.00 ± 0%
-```
-
-```bash
-goos: darwin
-goarch: arm64
-pkg: github.com/nikolaydubina/fpmoney
-BenchmarkArithmetic/add_x1-16         1000000000	         0.54 ns/op	       0 B/op	       0 allocs/op
-BenchmarkArithmetic/add_x100-16       	26382420	        44.42 ns/op	       0 B/op	       0 allocs/op
-PASS
-ok  	github.com/nikolaydubina/fpmoney	14.200s
+ok      github.com/nikolaydubina/fpmoney        11.287s
 ```
 
 ## References and Related Work
