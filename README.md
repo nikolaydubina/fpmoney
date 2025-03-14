@@ -52,6 +52,28 @@ Storing them `int64` you would get.
 ### Benchmarks
 
 ```bash
+$ go test -bench=. -benchmem .
+goos: darwin
+goarch: arm64
+pkg: github.com/nikolaydubina/fpmoney
+cpu: Apple M3 Max
+BenchmarkCurrency_UnmarshalText-16      600347949                1.888 ns/op           0 B/op          0 allocs/op
+BenchmarkCurrency_AppendText-16         448143426                2.676 ns/op           0 B/op          0 allocs/op
+BenchmarkCurrency_MarshalText-16        92917315                13.04 ns/op            8 B/op          1 allocs/op
+BenchmarkCurrency_String-16             1000000000               1.083 ns/op           0 B/op          0 allocs/op
+BenchmarkArithmetic/add_x1-16           1000000000               0.5428 ns/op          0 B/op          0 allocs/op
+BenchmarkArithmetic/add_x100-16         27640482                43.61 ns/op            0 B/op          0 allocs/op
+BenchmarkJSONUnmarshal/small-16          4501581               263.8 ns/op           198 B/op          3 allocs/op
+BenchmarkJSONUnmarshal/large-16          3550576               340.2 ns/op           216 B/op          3 allocs/op
+BenchmarkJSONMarshal/small-16            5897948               197.3 ns/op           160 B/op          3 allocs/op
+BenchmarkJSONMarshal/large-16            4855674               246.4 ns/op           176 B/op          3 allocs/op
+BenchmarkJSONMarshal_Exact/small-16     48828040                24.41 ns/op          112 B/op          1 allocs/op
+BenchmarkJSONMarshal_Exact/large-16     34155758                34.09 ns/op          112 B/op          1 allocs/op
+PASS
+ok      github.com/nikolaydubina/fpmoney        15.160s
+```
+
+```bash
 $ go test -bench=. -benchmem . > fpmoney.bench
 $ go test -bench=. -benchmem ./internal/bench/float32 > float32.bench
 $ go test -bench=. -benchmem ./internal/bench/int > int.bench

@@ -28,7 +28,7 @@ func (c Currency) scale() int64 {
 	}
 }
 
-//go:generate go run github.com/nikolaydubina/go-enum-encoding@latest -type=Currency -string
+//go:generate go-enum-encoding -type=Currency -string
 const (
 	UndefinedCurrency Currency = iota //
 	AED                               // json:"AED"

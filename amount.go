@@ -143,19 +143,25 @@ func (a *Amount) UnmarshalJSON(b []byte) (err error) {
 	return err
 }
 
-func (a Amount) MarshalJSON() ([]byte, error) {
-	b := make([]byte, 0, 100)
+func (a Amount) AppendJSON(b []byte) ([]byte, error) {
 	b = append(b, `{"`...)
 	b = append(b, keyAmount...)
 	b = append(b, `":`...)
+
 	b = fpdecimal.AppendFixedPointDecimal(b, a.v, a.c.Exponent())
+
 	b = append(b, `,"`...)
 	b = append(b, keyCurrency...)
 	b = append(b, `":"`...)
-	b = append(b, a.c.String()...)
+
+	var err error
+	b, err = a.c.AppendText(b)
+
 	b = append(b, `"}`...)
-	return b, nil
+	return b, err
 }
+
+func (a Amount) MarshalJSON() ([]byte, error) { return a.AppendJSON(make([]byte, 0, 100)) }
 
 var ErrWrongCurrencyString = errors.New("wrong currency string")
 

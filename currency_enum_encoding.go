@@ -6,554 +6,1092 @@ import "errors"
 
 var ErrUnknownCurrency = errors.New("unknown Currency")
 
-var value_to_bytes_Currency = map[Currency][]byte{
-	AED: []byte("AED"),
-	AFN: []byte("AFN"),
-	ALL: []byte("ALL"),
-	AMD: []byte("AMD"),
-	ANG: []byte("ANG"),
-	AOA: []byte("AOA"),
-	ARS: []byte("ARS"),
-	AUD: []byte("AUD"),
-	AWG: []byte("AWG"),
-	AZN: []byte("AZN"),
-	BAM: []byte("BAM"),
-	BBD: []byte("BBD"),
-	BDT: []byte("BDT"),
-	BGN: []byte("BGN"),
-	BHD: []byte("BHD"),
-	BIF: []byte("BIF"),
-	BMD: []byte("BMD"),
-	BND: []byte("BND"),
-	BOB: []byte("BOB"),
-	BOV: []byte("BOV"),
-	BRL: []byte("BRL"),
-	BSD: []byte("BSD"),
-	BTN: []byte("BTN"),
-	BWP: []byte("BWP"),
-	BYN: []byte("BYN"),
-	BZD: []byte("BZD"),
-	CAD: []byte("CAD"),
-	CDF: []byte("CDF"),
-	CHE: []byte("CHE"),
-	CHF: []byte("CHF"),
-	CHW: []byte("CHW"),
-	CLP: []byte("CLP"),
-	CNY: []byte("CNY"),
-	COP: []byte("COP"),
-	COU: []byte("COU"),
-	CRC: []byte("CRC"),
-	CUP: []byte("CUP"),
-	CVE: []byte("CVE"),
-	CZK: []byte("CZK"),
-	DJF: []byte("DJF"),
-	DKK: []byte("DKK"),
-	DOP: []byte("DOP"),
-	DZD: []byte("DZD"),
-	EGP: []byte("EGP"),
-	ERN: []byte("ERN"),
-	ETB: []byte("ETB"),
-	EUR: []byte("EUR"),
-	FJD: []byte("FJD"),
-	FKP: []byte("FKP"),
-	GBP: []byte("GBP"),
-	GEL: []byte("GEL"),
-	GHS: []byte("GHS"),
-	GIP: []byte("GIP"),
-	GMD: []byte("GMD"),
-	GNF: []byte("GNF"),
-	GTQ: []byte("GTQ"),
-	GYD: []byte("GYD"),
-	HKD: []byte("HKD"),
-	HNL: []byte("HNL"),
-	HRD: []byte("HRD"),
-	HTG: []byte("HTG"),
-	HUF: []byte("HUF"),
-	IDR: []byte("IDR"),
-	ILS: []byte("ILS"),
-	INR: []byte("INR"),
-	IQD: []byte("IQD"),
-	IRR: []byte("IRR"),
-	ISK: []byte("ISK"),
-	JMD: []byte("JMD"),
-	JOD: []byte("JOD"),
-	JPY: []byte("JPY"),
-	KES: []byte("KES"),
-	KGS: []byte("KGS"),
-	KHR: []byte("KHR"),
-	KMF: []byte("KMF"),
-	KPW: []byte("KPW"),
-	KRW: []byte("KRW"),
-	KWD: []byte("KWD"),
-	KYD: []byte("KYD"),
-	KZT: []byte("KZT"),
-	LAK: []byte("LAK"),
-	LBP: []byte("LBP"),
-	LKR: []byte("LKR"),
-	LRD: []byte("LRD"),
-	LSL: []byte("LSL"),
-	LYD: []byte("LYD"),
-	MAD: []byte("MAD"),
-	MDL: []byte("MDL"),
-	MGA: []byte("MGA"),
-	MKD: []byte("MKD"),
-	MMK: []byte("MMK"),
-	MNT: []byte("MNT"),
-	MOP: []byte("MOP"),
-	MRU: []byte("MRU"),
-	MUR: []byte("MUR"),
-	MVR: []byte("MVR"),
-	MWK: []byte("MWK"),
-	MXN: []byte("MXN"),
-	MXV: []byte("MXV"),
-	MYR: []byte("MYR"),
-	MZN: []byte("MZN"),
-	NAD: []byte("NAD"),
-	NGN: []byte("NGN"),
-	NIO: []byte("NIO"),
-	NOK: []byte("NOK"),
-	NPR: []byte("NPR"),
-	NZD: []byte("NZD"),
-	OMR: []byte("OMR"),
-	PAB: []byte("PAB"),
-	PEN: []byte("PEN"),
-	PGK: []byte("PGK"),
-	PHP: []byte("PHP"),
-	PKR: []byte("PKR"),
-	PLN: []byte("PLN"),
-	PYG: []byte("PYG"),
-	QAR: []byte("QAR"),
-	RON: []byte("RON"),
-	RSD: []byte("RSD"),
-	RUB: []byte("RUB"),
-	RWF: []byte("RWF"),
-	SAR: []byte("SAR"),
-	SBD: []byte("SBD"),
-	SCR: []byte("SCR"),
-	SDG: []byte("SDG"),
-	SEK: []byte("SEK"),
-	SGD: []byte("SGD"),
-	SHP: []byte("SHP"),
-	SLE: []byte("SLE"),
-	SOS: []byte("SOS"),
-	SRD: []byte("SRD"),
-	SSP: []byte("SSP"),
-	STN: []byte("STN"),
-	SVC: []byte("SVC"),
-	SYP: []byte("SYP"),
-	SZL: []byte("SZL"),
-	THB: []byte("THB"),
-	TJS: []byte("TJS"),
-	TMT: []byte("TMT"),
-	TND: []byte("TND"),
-	TOP: []byte("TOP"),
-	TRY: []byte("TRY"),
-	TTD: []byte("TTD"),
-	TWD: []byte("TWD"),
-	TZS: []byte("TZS"),
-	UAH: []byte("UAH"),
-	UGX: []byte("UGX"),
-	USD: []byte("USD"),
-	USN: []byte("USN"),
-	UYI: []byte("UYI"),
-	UYU: []byte("UYU"),
-	UZS: []byte("UZS"),
-	VED: []byte("VED"),
-	VES: []byte("VES"),
-	VND: []byte("VND"),
-	VUV: []byte("VUV"),
-	WST: []byte("WST"),
-	XAF: []byte("XAF"),
-	XAG: []byte("XAG"),
-	XAU: []byte("XAU"),
-	XBA: []byte("XBA"),
-	XBB: []byte("XBB"),
-	XBC: []byte("XBC"),
-	XBD: []byte("XBD"),
-	XCD: []byte("XCD"),
-	XDR: []byte("XDR"),
-	XOF: []byte("XOF"),
-	XPD: []byte("XPD"),
-	XPF: []byte("XPF"),
-	XPT: []byte("XPT"),
-	XSU: []byte("XSU"),
-	XTS: []byte("XTS"),
-	XUA: []byte("XUA"),
-	XXX: []byte("XXX"),
-	YER: []byte("YER"),
-	ZAR: []byte("ZAR"),
-	ZMW: []byte("ZMW"),
-	ZWG: []byte("ZWG"),
-}
-
-var string_to_value_Currency = map[string]Currency{
-	"AED": AED,
-	"AFN": AFN,
-	"ALL": ALL,
-	"AMD": AMD,
-	"ANG": ANG,
-	"AOA": AOA,
-	"ARS": ARS,
-	"AUD": AUD,
-	"AWG": AWG,
-	"AZN": AZN,
-	"BAM": BAM,
-	"BBD": BBD,
-	"BDT": BDT,
-	"BGN": BGN,
-	"BHD": BHD,
-	"BIF": BIF,
-	"BMD": BMD,
-	"BND": BND,
-	"BOB": BOB,
-	"BOV": BOV,
-	"BRL": BRL,
-	"BSD": BSD,
-	"BTN": BTN,
-	"BWP": BWP,
-	"BYN": BYN,
-	"BZD": BZD,
-	"CAD": CAD,
-	"CDF": CDF,
-	"CHE": CHE,
-	"CHF": CHF,
-	"CHW": CHW,
-	"CLP": CLP,
-	"CNY": CNY,
-	"COP": COP,
-	"COU": COU,
-	"CRC": CRC,
-	"CUP": CUP,
-	"CVE": CVE,
-	"CZK": CZK,
-	"DJF": DJF,
-	"DKK": DKK,
-	"DOP": DOP,
-	"DZD": DZD,
-	"EGP": EGP,
-	"ERN": ERN,
-	"ETB": ETB,
-	"EUR": EUR,
-	"FJD": FJD,
-	"FKP": FKP,
-	"GBP": GBP,
-	"GEL": GEL,
-	"GHS": GHS,
-	"GIP": GIP,
-	"GMD": GMD,
-	"GNF": GNF,
-	"GTQ": GTQ,
-	"GYD": GYD,
-	"HKD": HKD,
-	"HNL": HNL,
-	"HRD": HRD,
-	"HTG": HTG,
-	"HUF": HUF,
-	"IDR": IDR,
-	"ILS": ILS,
-	"INR": INR,
-	"IQD": IQD,
-	"IRR": IRR,
-	"ISK": ISK,
-	"JMD": JMD,
-	"JOD": JOD,
-	"JPY": JPY,
-	"KES": KES,
-	"KGS": KGS,
-	"KHR": KHR,
-	"KMF": KMF,
-	"KPW": KPW,
-	"KRW": KRW,
-	"KWD": KWD,
-	"KYD": KYD,
-	"KZT": KZT,
-	"LAK": LAK,
-	"LBP": LBP,
-	"LKR": LKR,
-	"LRD": LRD,
-	"LSL": LSL,
-	"LYD": LYD,
-	"MAD": MAD,
-	"MDL": MDL,
-	"MGA": MGA,
-	"MKD": MKD,
-	"MMK": MMK,
-	"MNT": MNT,
-	"MOP": MOP,
-	"MRU": MRU,
-	"MUR": MUR,
-	"MVR": MVR,
-	"MWK": MWK,
-	"MXN": MXN,
-	"MXV": MXV,
-	"MYR": MYR,
-	"MZN": MZN,
-	"NAD": NAD,
-	"NGN": NGN,
-	"NIO": NIO,
-	"NOK": NOK,
-	"NPR": NPR,
-	"NZD": NZD,
-	"OMR": OMR,
-	"PAB": PAB,
-	"PEN": PEN,
-	"PGK": PGK,
-	"PHP": PHP,
-	"PKR": PKR,
-	"PLN": PLN,
-	"PYG": PYG,
-	"QAR": QAR,
-	"RON": RON,
-	"RSD": RSD,
-	"RUB": RUB,
-	"RWF": RWF,
-	"SAR": SAR,
-	"SBD": SBD,
-	"SCR": SCR,
-	"SDG": SDG,
-	"SEK": SEK,
-	"SGD": SGD,
-	"SHP": SHP,
-	"SLE": SLE,
-	"SOS": SOS,
-	"SRD": SRD,
-	"SSP": SSP,
-	"STN": STN,
-	"SVC": SVC,
-	"SYP": SYP,
-	"SZL": SZL,
-	"THB": THB,
-	"TJS": TJS,
-	"TMT": TMT,
-	"TND": TND,
-	"TOP": TOP,
-	"TRY": TRY,
-	"TTD": TTD,
-	"TWD": TWD,
-	"TZS": TZS,
-	"UAH": UAH,
-	"UGX": UGX,
-	"USD": USD,
-	"USN": USN,
-	"UYI": UYI,
-	"UYU": UYU,
-	"UZS": UZS,
-	"VED": VED,
-	"VES": VES,
-	"VND": VND,
-	"VUV": VUV,
-	"WST": WST,
-	"XAF": XAF,
-	"XAG": XAG,
-	"XAU": XAU,
-	"XBA": XBA,
-	"XBB": XBB,
-	"XBC": XBC,
-	"XBD": XBD,
-	"XCD": XCD,
-	"XDR": XDR,
-	"XOF": XOF,
-	"XPD": XPD,
-	"XPF": XPF,
-	"XPT": XPT,
-	"XSU": XSU,
-	"XTS": XTS,
-	"XUA": XUA,
-	"XXX": XXX,
-	"YER": YER,
-	"ZAR": ZAR,
-	"ZMW": ZMW,
-	"ZWG": ZWG,
-}
-
 func (s *Currency) UnmarshalText(text []byte) error {
-	var ok bool
-	if *s, ok = string_to_value_Currency[string(text)]; !ok {
+	switch string(text) {
+	case "AED":
+		*s = AED
+	case "AFN":
+		*s = AFN
+	case "ALL":
+		*s = ALL
+	case "AMD":
+		*s = AMD
+	case "ANG":
+		*s = ANG
+	case "AOA":
+		*s = AOA
+	case "ARS":
+		*s = ARS
+	case "AUD":
+		*s = AUD
+	case "AWG":
+		*s = AWG
+	case "AZN":
+		*s = AZN
+	case "BAM":
+		*s = BAM
+	case "BBD":
+		*s = BBD
+	case "BDT":
+		*s = BDT
+	case "BGN":
+		*s = BGN
+	case "BHD":
+		*s = BHD
+	case "BIF":
+		*s = BIF
+	case "BMD":
+		*s = BMD
+	case "BND":
+		*s = BND
+	case "BOB":
+		*s = BOB
+	case "BOV":
+		*s = BOV
+	case "BRL":
+		*s = BRL
+	case "BSD":
+		*s = BSD
+	case "BTN":
+		*s = BTN
+	case "BWP":
+		*s = BWP
+	case "BYN":
+		*s = BYN
+	case "BZD":
+		*s = BZD
+	case "CAD":
+		*s = CAD
+	case "CDF":
+		*s = CDF
+	case "CHE":
+		*s = CHE
+	case "CHF":
+		*s = CHF
+	case "CHW":
+		*s = CHW
+	case "CLP":
+		*s = CLP
+	case "CNY":
+		*s = CNY
+	case "COP":
+		*s = COP
+	case "COU":
+		*s = COU
+	case "CRC":
+		*s = CRC
+	case "CUP":
+		*s = CUP
+	case "CVE":
+		*s = CVE
+	case "CZK":
+		*s = CZK
+	case "DJF":
+		*s = DJF
+	case "DKK":
+		*s = DKK
+	case "DOP":
+		*s = DOP
+	case "DZD":
+		*s = DZD
+	case "EGP":
+		*s = EGP
+	case "ERN":
+		*s = ERN
+	case "ETB":
+		*s = ETB
+	case "EUR":
+		*s = EUR
+	case "FJD":
+		*s = FJD
+	case "FKP":
+		*s = FKP
+	case "GBP":
+		*s = GBP
+	case "GEL":
+		*s = GEL
+	case "GHS":
+		*s = GHS
+	case "GIP":
+		*s = GIP
+	case "GMD":
+		*s = GMD
+	case "GNF":
+		*s = GNF
+	case "GTQ":
+		*s = GTQ
+	case "GYD":
+		*s = GYD
+	case "HKD":
+		*s = HKD
+	case "HNL":
+		*s = HNL
+	case "HRD":
+		*s = HRD
+	case "HTG":
+		*s = HTG
+	case "HUF":
+		*s = HUF
+	case "IDR":
+		*s = IDR
+	case "ILS":
+		*s = ILS
+	case "INR":
+		*s = INR
+	case "IQD":
+		*s = IQD
+	case "IRR":
+		*s = IRR
+	case "ISK":
+		*s = ISK
+	case "JMD":
+		*s = JMD
+	case "JOD":
+		*s = JOD
+	case "JPY":
+		*s = JPY
+	case "KES":
+		*s = KES
+	case "KGS":
+		*s = KGS
+	case "KHR":
+		*s = KHR
+	case "KMF":
+		*s = KMF
+	case "KPW":
+		*s = KPW
+	case "KRW":
+		*s = KRW
+	case "KWD":
+		*s = KWD
+	case "KYD":
+		*s = KYD
+	case "KZT":
+		*s = KZT
+	case "LAK":
+		*s = LAK
+	case "LBP":
+		*s = LBP
+	case "LKR":
+		*s = LKR
+	case "LRD":
+		*s = LRD
+	case "LSL":
+		*s = LSL
+	case "LYD":
+		*s = LYD
+	case "MAD":
+		*s = MAD
+	case "MDL":
+		*s = MDL
+	case "MGA":
+		*s = MGA
+	case "MKD":
+		*s = MKD
+	case "MMK":
+		*s = MMK
+	case "MNT":
+		*s = MNT
+	case "MOP":
+		*s = MOP
+	case "MRU":
+		*s = MRU
+	case "MUR":
+		*s = MUR
+	case "MVR":
+		*s = MVR
+	case "MWK":
+		*s = MWK
+	case "MXN":
+		*s = MXN
+	case "MXV":
+		*s = MXV
+	case "MYR":
+		*s = MYR
+	case "MZN":
+		*s = MZN
+	case "NAD":
+		*s = NAD
+	case "NGN":
+		*s = NGN
+	case "NIO":
+		*s = NIO
+	case "NOK":
+		*s = NOK
+	case "NPR":
+		*s = NPR
+	case "NZD":
+		*s = NZD
+	case "OMR":
+		*s = OMR
+	case "PAB":
+		*s = PAB
+	case "PEN":
+		*s = PEN
+	case "PGK":
+		*s = PGK
+	case "PHP":
+		*s = PHP
+	case "PKR":
+		*s = PKR
+	case "PLN":
+		*s = PLN
+	case "PYG":
+		*s = PYG
+	case "QAR":
+		*s = QAR
+	case "RON":
+		*s = RON
+	case "RSD":
+		*s = RSD
+	case "RUB":
+		*s = RUB
+	case "RWF":
+		*s = RWF
+	case "SAR":
+		*s = SAR
+	case "SBD":
+		*s = SBD
+	case "SCR":
+		*s = SCR
+	case "SDG":
+		*s = SDG
+	case "SEK":
+		*s = SEK
+	case "SGD":
+		*s = SGD
+	case "SHP":
+		*s = SHP
+	case "SLE":
+		*s = SLE
+	case "SOS":
+		*s = SOS
+	case "SRD":
+		*s = SRD
+	case "SSP":
+		*s = SSP
+	case "STN":
+		*s = STN
+	case "SVC":
+		*s = SVC
+	case "SYP":
+		*s = SYP
+	case "SZL":
+		*s = SZL
+	case "THB":
+		*s = THB
+	case "TJS":
+		*s = TJS
+	case "TMT":
+		*s = TMT
+	case "TND":
+		*s = TND
+	case "TOP":
+		*s = TOP
+	case "TRY":
+		*s = TRY
+	case "TTD":
+		*s = TTD
+	case "TWD":
+		*s = TWD
+	case "TZS":
+		*s = TZS
+	case "UAH":
+		*s = UAH
+	case "UGX":
+		*s = UGX
+	case "USD":
+		*s = USD
+	case "USN":
+		*s = USN
+	case "UYI":
+		*s = UYI
+	case "UYU":
+		*s = UYU
+	case "UZS":
+		*s = UZS
+	case "VED":
+		*s = VED
+	case "VES":
+		*s = VES
+	case "VND":
+		*s = VND
+	case "VUV":
+		*s = VUV
+	case "WST":
+		*s = WST
+	case "XAF":
+		*s = XAF
+	case "XAG":
+		*s = XAG
+	case "XAU":
+		*s = XAU
+	case "XBA":
+		*s = XBA
+	case "XBB":
+		*s = XBB
+	case "XBC":
+		*s = XBC
+	case "XBD":
+		*s = XBD
+	case "XCD":
+		*s = XCD
+	case "XDR":
+		*s = XDR
+	case "XOF":
+		*s = XOF
+	case "XPD":
+		*s = XPD
+	case "XPF":
+		*s = XPF
+	case "XPT":
+		*s = XPT
+	case "XSU":
+		*s = XSU
+	case "XTS":
+		*s = XTS
+	case "XUA":
+		*s = XUA
+	case "XXX":
+		*s = XXX
+	case "YER":
+		*s = YER
+	case "ZAR":
+		*s = ZAR
+	case "ZMW":
+		*s = ZMW
+	case "ZWG":
+		*s = ZWG
+	default:
 		return ErrUnknownCurrency
 	}
 	return nil
 }
 
-func (s Currency) MarshalText() ([]byte, error) { return value_to_bytes_Currency[s], nil }
+var seq_bytes_Currency = [...][]byte{[]byte("AED"), []byte("AFN"), []byte("ALL"), []byte("AMD"), []byte("ANG"), []byte("AOA"), []byte("ARS"), []byte("AUD"), []byte("AWG"), []byte("AZN"), []byte("BAM"), []byte("BBD"), []byte("BDT"), []byte("BGN"), []byte("BHD"), []byte("BIF"), []byte("BMD"), []byte("BND"), []byte("BOB"), []byte("BOV"), []byte("BRL"), []byte("BSD"), []byte("BTN"), []byte("BWP"), []byte("BYN"), []byte("BZD"), []byte("CAD"), []byte("CDF"), []byte("CHE"), []byte("CHF"), []byte("CHW"), []byte("CLP"), []byte("CNY"), []byte("COP"), []byte("COU"), []byte("CRC"), []byte("CUP"), []byte("CVE"), []byte("CZK"), []byte("DJF"), []byte("DKK"), []byte("DOP"), []byte("DZD"), []byte("EGP"), []byte("ERN"), []byte("ETB"), []byte("EUR"), []byte("FJD"), []byte("FKP"), []byte("GBP"), []byte("GEL"), []byte("GHS"), []byte("GIP"), []byte("GMD"), []byte("GNF"), []byte("GTQ"), []byte("GYD"), []byte("HKD"), []byte("HNL"), []byte("HRD"), []byte("HTG"), []byte("HUF"), []byte("IDR"), []byte("ILS"), []byte("INR"), []byte("IQD"), []byte("IRR"), []byte("ISK"), []byte("JMD"), []byte("JOD"), []byte("JPY"), []byte("KES"), []byte("KGS"), []byte("KHR"), []byte("KMF"), []byte("KPW"), []byte("KRW"), []byte("KWD"), []byte("KYD"), []byte("KZT"), []byte("LAK"), []byte("LBP"), []byte("LKR"), []byte("LRD"), []byte("LSL"), []byte("LYD"), []byte("MAD"), []byte("MDL"), []byte("MGA"), []byte("MKD"), []byte("MMK"), []byte("MNT"), []byte("MOP"), []byte("MRU"), []byte("MUR"), []byte("MVR"), []byte("MWK"), []byte("MXN"), []byte("MXV"), []byte("MYR"), []byte("MZN"), []byte("NAD"), []byte("NGN"), []byte("NIO"), []byte("NOK"), []byte("NPR"), []byte("NZD"), []byte("OMR"), []byte("PAB"), []byte("PEN"), []byte("PGK"), []byte("PHP"), []byte("PKR"), []byte("PLN"), []byte("PYG"), []byte("QAR"), []byte("RON"), []byte("RSD"), []byte("RUB"), []byte("RWF"), []byte("SAR"), []byte("SBD"), []byte("SCR"), []byte("SDG"), []byte("SEK"), []byte("SGD"), []byte("SHP"), []byte("SLE"), []byte("SOS"), []byte("SRD"), []byte("SSP"), []byte("STN"), []byte("SVC"), []byte("SYP"), []byte("SZL"), []byte("THB"), []byte("TJS"), []byte("TMT"), []byte("TND"), []byte("TOP"), []byte("TRY"), []byte("TTD"), []byte("TWD"), []byte("TZS"), []byte("UAH"), []byte("UGX"), []byte("USD"), []byte("USN"), []byte("UYI"), []byte("UYU"), []byte("UZS"), []byte("VED"), []byte("VES"), []byte("VND"), []byte("VUV"), []byte("WST"), []byte("XAF"), []byte("XAG"), []byte("XAU"), []byte("XBA"), []byte("XBB"), []byte("XBC"), []byte("XBD"), []byte("XCD"), []byte("XDR"), []byte("XOF"), []byte("XPD"), []byte("XPF"), []byte("XPT"), []byte("XSU"), []byte("XTS"), []byte("XUA"), []byte("XXX"), []byte("YER"), []byte("ZAR"), []byte("ZMW"), []byte("ZWG")}
 
-var value_to_string_Currency = map[Currency]string{
-	AED: "AED",
-	AFN: "AFN",
-	ALL: "ALL",
-	AMD: "AMD",
-	ANG: "ANG",
-	AOA: "AOA",
-	ARS: "ARS",
-	AUD: "AUD",
-	AWG: "AWG",
-	AZN: "AZN",
-	BAM: "BAM",
-	BBD: "BBD",
-	BDT: "BDT",
-	BGN: "BGN",
-	BHD: "BHD",
-	BIF: "BIF",
-	BMD: "BMD",
-	BND: "BND",
-	BOB: "BOB",
-	BOV: "BOV",
-	BRL: "BRL",
-	BSD: "BSD",
-	BTN: "BTN",
-	BWP: "BWP",
-	BYN: "BYN",
-	BZD: "BZD",
-	CAD: "CAD",
-	CDF: "CDF",
-	CHE: "CHE",
-	CHF: "CHF",
-	CHW: "CHW",
-	CLP: "CLP",
-	CNY: "CNY",
-	COP: "COP",
-	COU: "COU",
-	CRC: "CRC",
-	CUP: "CUP",
-	CVE: "CVE",
-	CZK: "CZK",
-	DJF: "DJF",
-	DKK: "DKK",
-	DOP: "DOP",
-	DZD: "DZD",
-	EGP: "EGP",
-	ERN: "ERN",
-	ETB: "ETB",
-	EUR: "EUR",
-	FJD: "FJD",
-	FKP: "FKP",
-	GBP: "GBP",
-	GEL: "GEL",
-	GHS: "GHS",
-	GIP: "GIP",
-	GMD: "GMD",
-	GNF: "GNF",
-	GTQ: "GTQ",
-	GYD: "GYD",
-	HKD: "HKD",
-	HNL: "HNL",
-	HRD: "HRD",
-	HTG: "HTG",
-	HUF: "HUF",
-	IDR: "IDR",
-	ILS: "ILS",
-	INR: "INR",
-	IQD: "IQD",
-	IRR: "IRR",
-	ISK: "ISK",
-	JMD: "JMD",
-	JOD: "JOD",
-	JPY: "JPY",
-	KES: "KES",
-	KGS: "KGS",
-	KHR: "KHR",
-	KMF: "KMF",
-	KPW: "KPW",
-	KRW: "KRW",
-	KWD: "KWD",
-	KYD: "KYD",
-	KZT: "KZT",
-	LAK: "LAK",
-	LBP: "LBP",
-	LKR: "LKR",
-	LRD: "LRD",
-	LSL: "LSL",
-	LYD: "LYD",
-	MAD: "MAD",
-	MDL: "MDL",
-	MGA: "MGA",
-	MKD: "MKD",
-	MMK: "MMK",
-	MNT: "MNT",
-	MOP: "MOP",
-	MRU: "MRU",
-	MUR: "MUR",
-	MVR: "MVR",
-	MWK: "MWK",
-	MXN: "MXN",
-	MXV: "MXV",
-	MYR: "MYR",
-	MZN: "MZN",
-	NAD: "NAD",
-	NGN: "NGN",
-	NIO: "NIO",
-	NOK: "NOK",
-	NPR: "NPR",
-	NZD: "NZD",
-	OMR: "OMR",
-	PAB: "PAB",
-	PEN: "PEN",
-	PGK: "PGK",
-	PHP: "PHP",
-	PKR: "PKR",
-	PLN: "PLN",
-	PYG: "PYG",
-	QAR: "QAR",
-	RON: "RON",
-	RSD: "RSD",
-	RUB: "RUB",
-	RWF: "RWF",
-	SAR: "SAR",
-	SBD: "SBD",
-	SCR: "SCR",
-	SDG: "SDG",
-	SEK: "SEK",
-	SGD: "SGD",
-	SHP: "SHP",
-	SLE: "SLE",
-	SOS: "SOS",
-	SRD: "SRD",
-	SSP: "SSP",
-	STN: "STN",
-	SVC: "SVC",
-	SYP: "SYP",
-	SZL: "SZL",
-	THB: "THB",
-	TJS: "TJS",
-	TMT: "TMT",
-	TND: "TND",
-	TOP: "TOP",
-	TRY: "TRY",
-	TTD: "TTD",
-	TWD: "TWD",
-	TZS: "TZS",
-	UAH: "UAH",
-	UGX: "UGX",
-	USD: "USD",
-	USN: "USN",
-	UYI: "UYI",
-	UYU: "UYU",
-	UZS: "UZS",
-	VED: "VED",
-	VES: "VES",
-	VND: "VND",
-	VUV: "VUV",
-	WST: "WST",
-	XAF: "XAF",
-	XAG: "XAG",
-	XAU: "XAU",
-	XBA: "XBA",
-	XBB: "XBB",
-	XBC: "XBC",
-	XBD: "XBD",
-	XCD: "XCD",
-	XDR: "XDR",
-	XOF: "XOF",
-	XPD: "XPD",
-	XPF: "XPF",
-	XPT: "XPT",
-	XSU: "XSU",
-	XTS: "XTS",
-	XUA: "XUA",
-	XXX: "XXX",
-	YER: "YER",
-	ZAR: "ZAR",
-	ZMW: "ZMW",
-	ZWG: "ZWG",
+func (s Currency) MarshalText() ([]byte, error) { return s.AppendText(nil) }
+
+func (s Currency) AppendText(b []byte) ([]byte, error) {
+	switch s {
+	case AED:
+		return append(b, seq_bytes_Currency[0]...), nil
+	case AFN:
+		return append(b, seq_bytes_Currency[1]...), nil
+	case ALL:
+		return append(b, seq_bytes_Currency[2]...), nil
+	case AMD:
+		return append(b, seq_bytes_Currency[3]...), nil
+	case ANG:
+		return append(b, seq_bytes_Currency[4]...), nil
+	case AOA:
+		return append(b, seq_bytes_Currency[5]...), nil
+	case ARS:
+		return append(b, seq_bytes_Currency[6]...), nil
+	case AUD:
+		return append(b, seq_bytes_Currency[7]...), nil
+	case AWG:
+		return append(b, seq_bytes_Currency[8]...), nil
+	case AZN:
+		return append(b, seq_bytes_Currency[9]...), nil
+	case BAM:
+		return append(b, seq_bytes_Currency[10]...), nil
+	case BBD:
+		return append(b, seq_bytes_Currency[11]...), nil
+	case BDT:
+		return append(b, seq_bytes_Currency[12]...), nil
+	case BGN:
+		return append(b, seq_bytes_Currency[13]...), nil
+	case BHD:
+		return append(b, seq_bytes_Currency[14]...), nil
+	case BIF:
+		return append(b, seq_bytes_Currency[15]...), nil
+	case BMD:
+		return append(b, seq_bytes_Currency[16]...), nil
+	case BND:
+		return append(b, seq_bytes_Currency[17]...), nil
+	case BOB:
+		return append(b, seq_bytes_Currency[18]...), nil
+	case BOV:
+		return append(b, seq_bytes_Currency[19]...), nil
+	case BRL:
+		return append(b, seq_bytes_Currency[20]...), nil
+	case BSD:
+		return append(b, seq_bytes_Currency[21]...), nil
+	case BTN:
+		return append(b, seq_bytes_Currency[22]...), nil
+	case BWP:
+		return append(b, seq_bytes_Currency[23]...), nil
+	case BYN:
+		return append(b, seq_bytes_Currency[24]...), nil
+	case BZD:
+		return append(b, seq_bytes_Currency[25]...), nil
+	case CAD:
+		return append(b, seq_bytes_Currency[26]...), nil
+	case CDF:
+		return append(b, seq_bytes_Currency[27]...), nil
+	case CHE:
+		return append(b, seq_bytes_Currency[28]...), nil
+	case CHF:
+		return append(b, seq_bytes_Currency[29]...), nil
+	case CHW:
+		return append(b, seq_bytes_Currency[30]...), nil
+	case CLP:
+		return append(b, seq_bytes_Currency[31]...), nil
+	case CNY:
+		return append(b, seq_bytes_Currency[32]...), nil
+	case COP:
+		return append(b, seq_bytes_Currency[33]...), nil
+	case COU:
+		return append(b, seq_bytes_Currency[34]...), nil
+	case CRC:
+		return append(b, seq_bytes_Currency[35]...), nil
+	case CUP:
+		return append(b, seq_bytes_Currency[36]...), nil
+	case CVE:
+		return append(b, seq_bytes_Currency[37]...), nil
+	case CZK:
+		return append(b, seq_bytes_Currency[38]...), nil
+	case DJF:
+		return append(b, seq_bytes_Currency[39]...), nil
+	case DKK:
+		return append(b, seq_bytes_Currency[40]...), nil
+	case DOP:
+		return append(b, seq_bytes_Currency[41]...), nil
+	case DZD:
+		return append(b, seq_bytes_Currency[42]...), nil
+	case EGP:
+		return append(b, seq_bytes_Currency[43]...), nil
+	case ERN:
+		return append(b, seq_bytes_Currency[44]...), nil
+	case ETB:
+		return append(b, seq_bytes_Currency[45]...), nil
+	case EUR:
+		return append(b, seq_bytes_Currency[46]...), nil
+	case FJD:
+		return append(b, seq_bytes_Currency[47]...), nil
+	case FKP:
+		return append(b, seq_bytes_Currency[48]...), nil
+	case GBP:
+		return append(b, seq_bytes_Currency[49]...), nil
+	case GEL:
+		return append(b, seq_bytes_Currency[50]...), nil
+	case GHS:
+		return append(b, seq_bytes_Currency[51]...), nil
+	case GIP:
+		return append(b, seq_bytes_Currency[52]...), nil
+	case GMD:
+		return append(b, seq_bytes_Currency[53]...), nil
+	case GNF:
+		return append(b, seq_bytes_Currency[54]...), nil
+	case GTQ:
+		return append(b, seq_bytes_Currency[55]...), nil
+	case GYD:
+		return append(b, seq_bytes_Currency[56]...), nil
+	case HKD:
+		return append(b, seq_bytes_Currency[57]...), nil
+	case HNL:
+		return append(b, seq_bytes_Currency[58]...), nil
+	case HRD:
+		return append(b, seq_bytes_Currency[59]...), nil
+	case HTG:
+		return append(b, seq_bytes_Currency[60]...), nil
+	case HUF:
+		return append(b, seq_bytes_Currency[61]...), nil
+	case IDR:
+		return append(b, seq_bytes_Currency[62]...), nil
+	case ILS:
+		return append(b, seq_bytes_Currency[63]...), nil
+	case INR:
+		return append(b, seq_bytes_Currency[64]...), nil
+	case IQD:
+		return append(b, seq_bytes_Currency[65]...), nil
+	case IRR:
+		return append(b, seq_bytes_Currency[66]...), nil
+	case ISK:
+		return append(b, seq_bytes_Currency[67]...), nil
+	case JMD:
+		return append(b, seq_bytes_Currency[68]...), nil
+	case JOD:
+		return append(b, seq_bytes_Currency[69]...), nil
+	case JPY:
+		return append(b, seq_bytes_Currency[70]...), nil
+	case KES:
+		return append(b, seq_bytes_Currency[71]...), nil
+	case KGS:
+		return append(b, seq_bytes_Currency[72]...), nil
+	case KHR:
+		return append(b, seq_bytes_Currency[73]...), nil
+	case KMF:
+		return append(b, seq_bytes_Currency[74]...), nil
+	case KPW:
+		return append(b, seq_bytes_Currency[75]...), nil
+	case KRW:
+		return append(b, seq_bytes_Currency[76]...), nil
+	case KWD:
+		return append(b, seq_bytes_Currency[77]...), nil
+	case KYD:
+		return append(b, seq_bytes_Currency[78]...), nil
+	case KZT:
+		return append(b, seq_bytes_Currency[79]...), nil
+	case LAK:
+		return append(b, seq_bytes_Currency[80]...), nil
+	case LBP:
+		return append(b, seq_bytes_Currency[81]...), nil
+	case LKR:
+		return append(b, seq_bytes_Currency[82]...), nil
+	case LRD:
+		return append(b, seq_bytes_Currency[83]...), nil
+	case LSL:
+		return append(b, seq_bytes_Currency[84]...), nil
+	case LYD:
+		return append(b, seq_bytes_Currency[85]...), nil
+	case MAD:
+		return append(b, seq_bytes_Currency[86]...), nil
+	case MDL:
+		return append(b, seq_bytes_Currency[87]...), nil
+	case MGA:
+		return append(b, seq_bytes_Currency[88]...), nil
+	case MKD:
+		return append(b, seq_bytes_Currency[89]...), nil
+	case MMK:
+		return append(b, seq_bytes_Currency[90]...), nil
+	case MNT:
+		return append(b, seq_bytes_Currency[91]...), nil
+	case MOP:
+		return append(b, seq_bytes_Currency[92]...), nil
+	case MRU:
+		return append(b, seq_bytes_Currency[93]...), nil
+	case MUR:
+		return append(b, seq_bytes_Currency[94]...), nil
+	case MVR:
+		return append(b, seq_bytes_Currency[95]...), nil
+	case MWK:
+		return append(b, seq_bytes_Currency[96]...), nil
+	case MXN:
+		return append(b, seq_bytes_Currency[97]...), nil
+	case MXV:
+		return append(b, seq_bytes_Currency[98]...), nil
+	case MYR:
+		return append(b, seq_bytes_Currency[99]...), nil
+	case MZN:
+		return append(b, seq_bytes_Currency[100]...), nil
+	case NAD:
+		return append(b, seq_bytes_Currency[101]...), nil
+	case NGN:
+		return append(b, seq_bytes_Currency[102]...), nil
+	case NIO:
+		return append(b, seq_bytes_Currency[103]...), nil
+	case NOK:
+		return append(b, seq_bytes_Currency[104]...), nil
+	case NPR:
+		return append(b, seq_bytes_Currency[105]...), nil
+	case NZD:
+		return append(b, seq_bytes_Currency[106]...), nil
+	case OMR:
+		return append(b, seq_bytes_Currency[107]...), nil
+	case PAB:
+		return append(b, seq_bytes_Currency[108]...), nil
+	case PEN:
+		return append(b, seq_bytes_Currency[109]...), nil
+	case PGK:
+		return append(b, seq_bytes_Currency[110]...), nil
+	case PHP:
+		return append(b, seq_bytes_Currency[111]...), nil
+	case PKR:
+		return append(b, seq_bytes_Currency[112]...), nil
+	case PLN:
+		return append(b, seq_bytes_Currency[113]...), nil
+	case PYG:
+		return append(b, seq_bytes_Currency[114]...), nil
+	case QAR:
+		return append(b, seq_bytes_Currency[115]...), nil
+	case RON:
+		return append(b, seq_bytes_Currency[116]...), nil
+	case RSD:
+		return append(b, seq_bytes_Currency[117]...), nil
+	case RUB:
+		return append(b, seq_bytes_Currency[118]...), nil
+	case RWF:
+		return append(b, seq_bytes_Currency[119]...), nil
+	case SAR:
+		return append(b, seq_bytes_Currency[120]...), nil
+	case SBD:
+		return append(b, seq_bytes_Currency[121]...), nil
+	case SCR:
+		return append(b, seq_bytes_Currency[122]...), nil
+	case SDG:
+		return append(b, seq_bytes_Currency[123]...), nil
+	case SEK:
+		return append(b, seq_bytes_Currency[124]...), nil
+	case SGD:
+		return append(b, seq_bytes_Currency[125]...), nil
+	case SHP:
+		return append(b, seq_bytes_Currency[126]...), nil
+	case SLE:
+		return append(b, seq_bytes_Currency[127]...), nil
+	case SOS:
+		return append(b, seq_bytes_Currency[128]...), nil
+	case SRD:
+		return append(b, seq_bytes_Currency[129]...), nil
+	case SSP:
+		return append(b, seq_bytes_Currency[130]...), nil
+	case STN:
+		return append(b, seq_bytes_Currency[131]...), nil
+	case SVC:
+		return append(b, seq_bytes_Currency[132]...), nil
+	case SYP:
+		return append(b, seq_bytes_Currency[133]...), nil
+	case SZL:
+		return append(b, seq_bytes_Currency[134]...), nil
+	case THB:
+		return append(b, seq_bytes_Currency[135]...), nil
+	case TJS:
+		return append(b, seq_bytes_Currency[136]...), nil
+	case TMT:
+		return append(b, seq_bytes_Currency[137]...), nil
+	case TND:
+		return append(b, seq_bytes_Currency[138]...), nil
+	case TOP:
+		return append(b, seq_bytes_Currency[139]...), nil
+	case TRY:
+		return append(b, seq_bytes_Currency[140]...), nil
+	case TTD:
+		return append(b, seq_bytes_Currency[141]...), nil
+	case TWD:
+		return append(b, seq_bytes_Currency[142]...), nil
+	case TZS:
+		return append(b, seq_bytes_Currency[143]...), nil
+	case UAH:
+		return append(b, seq_bytes_Currency[144]...), nil
+	case UGX:
+		return append(b, seq_bytes_Currency[145]...), nil
+	case USD:
+		return append(b, seq_bytes_Currency[146]...), nil
+	case USN:
+		return append(b, seq_bytes_Currency[147]...), nil
+	case UYI:
+		return append(b, seq_bytes_Currency[148]...), nil
+	case UYU:
+		return append(b, seq_bytes_Currency[149]...), nil
+	case UZS:
+		return append(b, seq_bytes_Currency[150]...), nil
+	case VED:
+		return append(b, seq_bytes_Currency[151]...), nil
+	case VES:
+		return append(b, seq_bytes_Currency[152]...), nil
+	case VND:
+		return append(b, seq_bytes_Currency[153]...), nil
+	case VUV:
+		return append(b, seq_bytes_Currency[154]...), nil
+	case WST:
+		return append(b, seq_bytes_Currency[155]...), nil
+	case XAF:
+		return append(b, seq_bytes_Currency[156]...), nil
+	case XAG:
+		return append(b, seq_bytes_Currency[157]...), nil
+	case XAU:
+		return append(b, seq_bytes_Currency[158]...), nil
+	case XBA:
+		return append(b, seq_bytes_Currency[159]...), nil
+	case XBB:
+		return append(b, seq_bytes_Currency[160]...), nil
+	case XBC:
+		return append(b, seq_bytes_Currency[161]...), nil
+	case XBD:
+		return append(b, seq_bytes_Currency[162]...), nil
+	case XCD:
+		return append(b, seq_bytes_Currency[163]...), nil
+	case XDR:
+		return append(b, seq_bytes_Currency[164]...), nil
+	case XOF:
+		return append(b, seq_bytes_Currency[165]...), nil
+	case XPD:
+		return append(b, seq_bytes_Currency[166]...), nil
+	case XPF:
+		return append(b, seq_bytes_Currency[167]...), nil
+	case XPT:
+		return append(b, seq_bytes_Currency[168]...), nil
+	case XSU:
+		return append(b, seq_bytes_Currency[169]...), nil
+	case XTS:
+		return append(b, seq_bytes_Currency[170]...), nil
+	case XUA:
+		return append(b, seq_bytes_Currency[171]...), nil
+	case XXX:
+		return append(b, seq_bytes_Currency[172]...), nil
+	case YER:
+		return append(b, seq_bytes_Currency[173]...), nil
+	case ZAR:
+		return append(b, seq_bytes_Currency[174]...), nil
+	case ZMW:
+		return append(b, seq_bytes_Currency[175]...), nil
+	case ZWG:
+		return append(b, seq_bytes_Currency[176]...), nil
+	default:
+		return nil, ErrUnknownCurrency
+	}
 }
 
-func (s Currency) String() string { return value_to_string_Currency[s] }
+var seq_string_Currency = [...]string{"AED", "AFN", "ALL", "AMD", "ANG", "AOA", "ARS", "AUD", "AWG", "AZN", "BAM", "BBD", "BDT", "BGN", "BHD", "BIF", "BMD", "BND", "BOB", "BOV", "BRL", "BSD", "BTN", "BWP", "BYN", "BZD", "CAD", "CDF", "CHE", "CHF", "CHW", "CLP", "CNY", "COP", "COU", "CRC", "CUP", "CVE", "CZK", "DJF", "DKK", "DOP", "DZD", "EGP", "ERN", "ETB", "EUR", "FJD", "FKP", "GBP", "GEL", "GHS", "GIP", "GMD", "GNF", "GTQ", "GYD", "HKD", "HNL", "HRD", "HTG", "HUF", "IDR", "ILS", "INR", "IQD", "IRR", "ISK", "JMD", "JOD", "JPY", "KES", "KGS", "KHR", "KMF", "KPW", "KRW", "KWD", "KYD", "KZT", "LAK", "LBP", "LKR", "LRD", "LSL", "LYD", "MAD", "MDL", "MGA", "MKD", "MMK", "MNT", "MOP", "MRU", "MUR", "MVR", "MWK", "MXN", "MXV", "MYR", "MZN", "NAD", "NGN", "NIO", "NOK", "NPR", "NZD", "OMR", "PAB", "PEN", "PGK", "PHP", "PKR", "PLN", "PYG", "QAR", "RON", "RSD", "RUB", "RWF", "SAR", "SBD", "SCR", "SDG", "SEK", "SGD", "SHP", "SLE", "SOS", "SRD", "SSP", "STN", "SVC", "SYP", "SZL", "THB", "TJS", "TMT", "TND", "TOP", "TRY", "TTD", "TWD", "TZS", "UAH", "UGX", "USD", "USN", "UYI", "UYU", "UZS", "VED", "VES", "VND", "VUV", "WST", "XAF", "XAG", "XAU", "XBA", "XBB", "XBC", "XBD", "XCD", "XDR", "XOF", "XPD", "XPF", "XPT", "XSU", "XTS", "XUA", "XXX", "YER", "ZAR", "ZMW", "ZWG"}
+
+func (s Currency) String() string {
+	switch s {
+	case AED:
+		return seq_string_Currency[0]
+	case AFN:
+		return seq_string_Currency[1]
+	case ALL:
+		return seq_string_Currency[2]
+	case AMD:
+		return seq_string_Currency[3]
+	case ANG:
+		return seq_string_Currency[4]
+	case AOA:
+		return seq_string_Currency[5]
+	case ARS:
+		return seq_string_Currency[6]
+	case AUD:
+		return seq_string_Currency[7]
+	case AWG:
+		return seq_string_Currency[8]
+	case AZN:
+		return seq_string_Currency[9]
+	case BAM:
+		return seq_string_Currency[10]
+	case BBD:
+		return seq_string_Currency[11]
+	case BDT:
+		return seq_string_Currency[12]
+	case BGN:
+		return seq_string_Currency[13]
+	case BHD:
+		return seq_string_Currency[14]
+	case BIF:
+		return seq_string_Currency[15]
+	case BMD:
+		return seq_string_Currency[16]
+	case BND:
+		return seq_string_Currency[17]
+	case BOB:
+		return seq_string_Currency[18]
+	case BOV:
+		return seq_string_Currency[19]
+	case BRL:
+		return seq_string_Currency[20]
+	case BSD:
+		return seq_string_Currency[21]
+	case BTN:
+		return seq_string_Currency[22]
+	case BWP:
+		return seq_string_Currency[23]
+	case BYN:
+		return seq_string_Currency[24]
+	case BZD:
+		return seq_string_Currency[25]
+	case CAD:
+		return seq_string_Currency[26]
+	case CDF:
+		return seq_string_Currency[27]
+	case CHE:
+		return seq_string_Currency[28]
+	case CHF:
+		return seq_string_Currency[29]
+	case CHW:
+		return seq_string_Currency[30]
+	case CLP:
+		return seq_string_Currency[31]
+	case CNY:
+		return seq_string_Currency[32]
+	case COP:
+		return seq_string_Currency[33]
+	case COU:
+		return seq_string_Currency[34]
+	case CRC:
+		return seq_string_Currency[35]
+	case CUP:
+		return seq_string_Currency[36]
+	case CVE:
+		return seq_string_Currency[37]
+	case CZK:
+		return seq_string_Currency[38]
+	case DJF:
+		return seq_string_Currency[39]
+	case DKK:
+		return seq_string_Currency[40]
+	case DOP:
+		return seq_string_Currency[41]
+	case DZD:
+		return seq_string_Currency[42]
+	case EGP:
+		return seq_string_Currency[43]
+	case ERN:
+		return seq_string_Currency[44]
+	case ETB:
+		return seq_string_Currency[45]
+	case EUR:
+		return seq_string_Currency[46]
+	case FJD:
+		return seq_string_Currency[47]
+	case FKP:
+		return seq_string_Currency[48]
+	case GBP:
+		return seq_string_Currency[49]
+	case GEL:
+		return seq_string_Currency[50]
+	case GHS:
+		return seq_string_Currency[51]
+	case GIP:
+		return seq_string_Currency[52]
+	case GMD:
+		return seq_string_Currency[53]
+	case GNF:
+		return seq_string_Currency[54]
+	case GTQ:
+		return seq_string_Currency[55]
+	case GYD:
+		return seq_string_Currency[56]
+	case HKD:
+		return seq_string_Currency[57]
+	case HNL:
+		return seq_string_Currency[58]
+	case HRD:
+		return seq_string_Currency[59]
+	case HTG:
+		return seq_string_Currency[60]
+	case HUF:
+		return seq_string_Currency[61]
+	case IDR:
+		return seq_string_Currency[62]
+	case ILS:
+		return seq_string_Currency[63]
+	case INR:
+		return seq_string_Currency[64]
+	case IQD:
+		return seq_string_Currency[65]
+	case IRR:
+		return seq_string_Currency[66]
+	case ISK:
+		return seq_string_Currency[67]
+	case JMD:
+		return seq_string_Currency[68]
+	case JOD:
+		return seq_string_Currency[69]
+	case JPY:
+		return seq_string_Currency[70]
+	case KES:
+		return seq_string_Currency[71]
+	case KGS:
+		return seq_string_Currency[72]
+	case KHR:
+		return seq_string_Currency[73]
+	case KMF:
+		return seq_string_Currency[74]
+	case KPW:
+		return seq_string_Currency[75]
+	case KRW:
+		return seq_string_Currency[76]
+	case KWD:
+		return seq_string_Currency[77]
+	case KYD:
+		return seq_string_Currency[78]
+	case KZT:
+		return seq_string_Currency[79]
+	case LAK:
+		return seq_string_Currency[80]
+	case LBP:
+		return seq_string_Currency[81]
+	case LKR:
+		return seq_string_Currency[82]
+	case LRD:
+		return seq_string_Currency[83]
+	case LSL:
+		return seq_string_Currency[84]
+	case LYD:
+		return seq_string_Currency[85]
+	case MAD:
+		return seq_string_Currency[86]
+	case MDL:
+		return seq_string_Currency[87]
+	case MGA:
+		return seq_string_Currency[88]
+	case MKD:
+		return seq_string_Currency[89]
+	case MMK:
+		return seq_string_Currency[90]
+	case MNT:
+		return seq_string_Currency[91]
+	case MOP:
+		return seq_string_Currency[92]
+	case MRU:
+		return seq_string_Currency[93]
+	case MUR:
+		return seq_string_Currency[94]
+	case MVR:
+		return seq_string_Currency[95]
+	case MWK:
+		return seq_string_Currency[96]
+	case MXN:
+		return seq_string_Currency[97]
+	case MXV:
+		return seq_string_Currency[98]
+	case MYR:
+		return seq_string_Currency[99]
+	case MZN:
+		return seq_string_Currency[100]
+	case NAD:
+		return seq_string_Currency[101]
+	case NGN:
+		return seq_string_Currency[102]
+	case NIO:
+		return seq_string_Currency[103]
+	case NOK:
+		return seq_string_Currency[104]
+	case NPR:
+		return seq_string_Currency[105]
+	case NZD:
+		return seq_string_Currency[106]
+	case OMR:
+		return seq_string_Currency[107]
+	case PAB:
+		return seq_string_Currency[108]
+	case PEN:
+		return seq_string_Currency[109]
+	case PGK:
+		return seq_string_Currency[110]
+	case PHP:
+		return seq_string_Currency[111]
+	case PKR:
+		return seq_string_Currency[112]
+	case PLN:
+		return seq_string_Currency[113]
+	case PYG:
+		return seq_string_Currency[114]
+	case QAR:
+		return seq_string_Currency[115]
+	case RON:
+		return seq_string_Currency[116]
+	case RSD:
+		return seq_string_Currency[117]
+	case RUB:
+		return seq_string_Currency[118]
+	case RWF:
+		return seq_string_Currency[119]
+	case SAR:
+		return seq_string_Currency[120]
+	case SBD:
+		return seq_string_Currency[121]
+	case SCR:
+		return seq_string_Currency[122]
+	case SDG:
+		return seq_string_Currency[123]
+	case SEK:
+		return seq_string_Currency[124]
+	case SGD:
+		return seq_string_Currency[125]
+	case SHP:
+		return seq_string_Currency[126]
+	case SLE:
+		return seq_string_Currency[127]
+	case SOS:
+		return seq_string_Currency[128]
+	case SRD:
+		return seq_string_Currency[129]
+	case SSP:
+		return seq_string_Currency[130]
+	case STN:
+		return seq_string_Currency[131]
+	case SVC:
+		return seq_string_Currency[132]
+	case SYP:
+		return seq_string_Currency[133]
+	case SZL:
+		return seq_string_Currency[134]
+	case THB:
+		return seq_string_Currency[135]
+	case TJS:
+		return seq_string_Currency[136]
+	case TMT:
+		return seq_string_Currency[137]
+	case TND:
+		return seq_string_Currency[138]
+	case TOP:
+		return seq_string_Currency[139]
+	case TRY:
+		return seq_string_Currency[140]
+	case TTD:
+		return seq_string_Currency[141]
+	case TWD:
+		return seq_string_Currency[142]
+	case TZS:
+		return seq_string_Currency[143]
+	case UAH:
+		return seq_string_Currency[144]
+	case UGX:
+		return seq_string_Currency[145]
+	case USD:
+		return seq_string_Currency[146]
+	case USN:
+		return seq_string_Currency[147]
+	case UYI:
+		return seq_string_Currency[148]
+	case UYU:
+		return seq_string_Currency[149]
+	case UZS:
+		return seq_string_Currency[150]
+	case VED:
+		return seq_string_Currency[151]
+	case VES:
+		return seq_string_Currency[152]
+	case VND:
+		return seq_string_Currency[153]
+	case VUV:
+		return seq_string_Currency[154]
+	case WST:
+		return seq_string_Currency[155]
+	case XAF:
+		return seq_string_Currency[156]
+	case XAG:
+		return seq_string_Currency[157]
+	case XAU:
+		return seq_string_Currency[158]
+	case XBA:
+		return seq_string_Currency[159]
+	case XBB:
+		return seq_string_Currency[160]
+	case XBC:
+		return seq_string_Currency[161]
+	case XBD:
+		return seq_string_Currency[162]
+	case XCD:
+		return seq_string_Currency[163]
+	case XDR:
+		return seq_string_Currency[164]
+	case XOF:
+		return seq_string_Currency[165]
+	case XPD:
+		return seq_string_Currency[166]
+	case XPF:
+		return seq_string_Currency[167]
+	case XPT:
+		return seq_string_Currency[168]
+	case XSU:
+		return seq_string_Currency[169]
+	case XTS:
+		return seq_string_Currency[170]
+	case XUA:
+		return seq_string_Currency[171]
+	case XXX:
+		return seq_string_Currency[172]
+	case YER:
+		return seq_string_Currency[173]
+	case ZAR:
+		return seq_string_Currency[174]
+	case ZMW:
+		return seq_string_Currency[175]
+	case ZWG:
+		return seq_string_Currency[176]
+	default:
+		return ""
+	}
+}
