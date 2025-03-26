@@ -81,6 +81,10 @@ func (a Amount) DivMod(b int) (part Amount, remainder Amount) {
 	return Amount{v: a.v / int64(b), c: a.c}, Amount{v: a.v % int64(b), c: a.c}
 }
 
+func (a Amount) StringPair() (amount, currency string) {
+	return fpdecimal.FixedPointDecimalToString(a.v, a.c.Exponent()), a.c.String()
+}
+
 func (a Amount) String() string {
 	return fpdecimal.FixedPointDecimalToString(a.v, a.c.Exponent()) + " " + a.c.String()
 }

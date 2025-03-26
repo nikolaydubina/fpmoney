@@ -36,6 +36,14 @@ func ExampleAmount() {
 	// Output: 18000.04 SGD
 }
 
+func ExampleAmount_StringPair() {
+	amount := fpmoney.FromFloat(11.23, fpmoney.SGD)
+
+	amountStr, currencyStr := amount.StringPair()
+	fmt.Print(currencyStr, ":", amountStr)
+	// Output: SGD:11.23
+}
+
 func ExampleAmount_DivMod_part() {
 	x := fpmoney.FromInt(1, fpmoney.SGD)
 	a, r := x.DivMod(3)
