@@ -186,16 +186,18 @@ func (a Amount) AppendJSON(b []byte) ([]byte, error) {
 
 func (a Amount) MarshalJSON() ([]byte, error) { return a.AppendJSON(make([]byte, 0, 100)) }
 
+func (s Amount) NumBytes() int { return 1 + 8 }
+
 func (s Amount) AppendBinary(b []byte) ([]byte, error) {
 	b = append(b, byte(s.c))
 	b = binary.LittleEndian.AppendUint64(b, uint64(s.v))
 	return b, nil
 }
 
-func (s Amount) MarshalBinary() ([]byte, error) { return s.AppendBinary(make([]byte, 0, 9)) }
+func (s Amount) MarshalBinary() ([]byte, error) { return s.AppendBinary(make([]byte, 0, s.NumBytes())) }
 
 func (s *Amount) UnmarshalBinary(b []byte) error {
-	if len(b) != 9 {
+	if len(b) != s.NumBytes() {
 		return errors.New("invalid length")
 	}
 	s.c = Currency(b[0])
