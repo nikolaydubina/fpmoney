@@ -57,17 +57,21 @@ goos: darwin
 goarch: arm64
 pkg: github.com/nikolaydubina/fpmoney
 cpu: Apple M3 Max
-BenchmarkCurrency_UnmarshalText-16      510934713                2.213 ns/op           0 B/op          0 allocs/op
-BenchmarkCurrency_AppendText-16         439866170                2.714 ns/op           0 B/op          0 allocs/op
-BenchmarkCurrency_MarshalText-16        88133492                13.52 ns/op            8 B/op          1 allocs/op
-BenchmarkCurrency_String-16             1000000000               1.078 ns/op           0 B/op          0 allocs/op
-BenchmarkArithmetic/add-16              901921378                1.562 ns/op           0 B/op          0 allocs/op
-BenchmarkJSON/small/encode-16            5652006               211.6 ns/op           160 B/op          3 allocs/op
-BenchmarkJSON/small/decode-16            4993570               236.0 ns/op           152 B/op          2 allocs/op
-BenchmarkJSON/large/encode-16            4835323               246.9 ns/op           176 B/op          3 allocs/op
-BenchmarkJSON/large/decode-16            3946946               304.9 ns/op           152 B/op          2 allocs/op
+BenchmarkCurrency_UnmarshalText-16      711695404                1.610 ns/op           0 B/op          0 allocs/op
+BenchmarkCurrency_AppendText-16         446232057                2.698 ns/op           0 B/op          0 allocs/op
+BenchmarkCurrency_MarshalText-16        81956246                13.99 ns/op            8 B/op          1 allocs/op
+BenchmarkCurrency_String-16             1000000000               1.064 ns/op           0 B/op          0 allocs/op
+BenchmarkArithmetic/add-16              924924993                1.305 ns/op           0 B/op          0 allocs/op
+BenchmarkJSON/small/encode-16            6004620               198.5 ns/op           160 B/op          3 allocs/op
+BenchmarkJSON/small/decode-16            5047149               238.7 ns/op           152 B/op          2 allocs/op
+BenchmarkJSON/large/encode-16            4739722               255.7 ns/op           176 B/op          3 allocs/op
+BenchmarkJSON/large/decode-16            3737406               315.3 ns/op           152 B/op          2 allocs/op
+BenchmarkBinary/small/encode-16         132380481                9.044 ns/op          16 B/op          1 allocs/op
+BenchmarkBinary/small/decode-16         100000000               10.80 ns/op           16 B/op          1 allocs/op
+BenchmarkBinary/large/encode-16         133549021                8.995 ns/op          16 B/op          1 allocs/op
+BenchmarkBinary/large/decode-16         100000000               10.61 ns/op           16 B/op          1 allocs/op
 PASS
-ok      github.com/nikolaydubina/fpmoney        11.287s
+ok      github.com/nikolaydubina/fpmoney        15.804s
 ```
 
 ## References and Related Work
