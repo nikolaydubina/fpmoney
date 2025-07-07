@@ -36,6 +36,18 @@ func ExampleAmount() {
 	// Output: 18000.04 SGD
 }
 
+func ExampleAmount_Convert() {
+	price := fpmoney.FromInt(100, fpmoney.USD)
+	fmt.Print(price.Convert(fpmoney.EUR, 0.85))
+	// Output: 85 EUR
+}
+
+func ExampleAmount_Convert_same() {
+	price := fpmoney.FromInt(100, fpmoney.USD)
+	fmt.Print(price.Convert(fpmoney.USD, 1234))
+	// Output: 100 USD
+}
+
 func ExampleAmount_StringPair() {
 	amount := fpmoney.FromFloat(11.23, fpmoney.SGD)
 
@@ -536,6 +548,48 @@ func FuzzJSON_MarshalUnmarshal(f *testing.F) {
 	})
 }
 
+func FuzzBinary_MarshalUnmarshal(f *testing.F) {
+	currencies := [...]fpmoney.Currency{
+		fpmoney.KRW,
+		fpmoney.SGD,
+		fpmoney.BHD,
+	}
+
+	tests := []int64{
+		123456,
+		0,
+		1,
+	}
+	for _, tc := range tests {
+		for i := range currencies {
+			f.Add(tc, i)
+			f.Add(-tc, i)
+		}
+	}
+	f.Fuzz(func(t *testing.T, v int64, c int) {
+		if c > len(currencies)-1 || c < 0 {
+			t.Skip()
+		}
+
+		currency := currencies[c]
+		q := fpmoney.FromIntScaled(v, currency)
+
+		s, err := q.MarshalBinary()
+		if err != nil {
+			t.Error(err)
+		}
+
+		var x fpmoney.Amount
+		if err := x.UnmarshalBinary(s); err != nil {
+			t.Error(err, string(s))
+		}
+
+		if x != q {
+			t.Error(x, q, v, c, s)
+		}
+	})
+}
+
 func BenchmarkArithmetic(b *testing.B) {
 	x := fpmoney.FromFloat(rand.Float32(), fpmoney.SGD)
 	y := fpmoney.FromFloat(rand.Float32(), fpmoney.SGD)
@@ -594,6 +648,39 @@ func BenchmarkJSON(b *testing.B) {
 
 				for b.Loop() {
 					json.Unmarshal(v, &s)
+				}
+			})
+		})
+	}
+}
+
+func BenchmarkBinary(b *testing.B) {
+	for _, tc := range testsFloats {
+		b.Run(tc.name, func(b *testing.B) {
+			tests := make([]fpmoney.Amount, 0, len(tc.vals))
+			for _, q := range tc.vals {
+				var x fpmoney.Amount
+				if err := json.Unmarshal([]byte(q), &x); err != nil {
+					b.Error(err)
+				}
+				tests = append(tests, x)
+				tests = append(tests, x.Mul(-1))
+			}
+
+			b.Run("encode", func(b *testing.B) {
+				v := tests[rand.Intn(len(tests))]
+
+				for b.Loop() {
+					_, _ = v.MarshalBinary()
+				}
+			})
+
+			b.Run("decode", func(b *testing.B) {
+				var s fpmoney.Amount
+				v := []byte(tc.vals[rand.Intn(len(tc.vals))])
+
+				for b.Loop() {
+					s.UnmarshalBinary(v)
 				}
 			})
 		})

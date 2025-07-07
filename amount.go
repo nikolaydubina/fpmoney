@@ -1,10 +1,21 @@
 package fpmoney
 
 import (
+	"encoding/binary"
 	"errors"
 
 	"github.com/nikolaydubina/fpdecimal"
 )
+
+var ErrWrongCurrencyString = errors.New("wrong currency string")
+
+type ErrCurrencyMismatch struct {
+	A, B Currency
+}
+
+func NewErrCurrencyMismatch() *ErrCurrencyMismatch { return &ErrCurrencyMismatch{} }
+
+func (e *ErrCurrencyMismatch) Error() string { return e.A.String() + " != " + e.B.String() }
 
 // Amount stores fixed-precision decimal money.
 // Stores integer number of cents for ISO 4217 currency.
@@ -79,6 +90,14 @@ func (a Amount) Mul(b int) Amount { return Amount{v: a.v * int64(b), c: a.c} }
 
 func (a Amount) DivMod(b int) (part Amount, remainder Amount) {
 	return Amount{v: a.v / int64(b), c: a.c}, Amount{v: a.v % int64(b), c: a.c}
+}
+
+// Convert with rate=to/from
+func (a Amount) Convert(to Currency, rate float64) Amount {
+	if a.Currency() == to {
+		return a
+	}
+	return FromFloat(a.Float64()*rate, to)
 }
 
 func (a Amount) StringPair() (amount, currency string) {
@@ -167,12 +186,19 @@ func (a Amount) AppendJSON(b []byte) ([]byte, error) {
 
 func (a Amount) MarshalJSON() ([]byte, error) { return a.AppendJSON(make([]byte, 0, 100)) }
 
-var ErrWrongCurrencyString = errors.New("wrong currency string")
-
-type ErrCurrencyMismatch struct {
-	A, B Currency
+func (s Amount) AppendBinary(b []byte) ([]byte, error) {
+	b = append(b, byte(s.c))
+	b = binary.LittleEndian.AppendUint64(b, uint64(s.v))
+	return b, nil
 }
 
-func NewErrCurrencyMismatch() *ErrCurrencyMismatch { return &ErrCurrencyMismatch{} }
+func (s Amount) MarshalBinary() ([]byte, error) { return s.AppendBinary(make([]byte, 0, 9)) }
 
-func (e *ErrCurrencyMismatch) Error() string { return e.A.String() + " != " + e.B.String() }
+func (s *Amount) UnmarshalBinary(b []byte) error {
+	if len(b) != 9 {
+		return errors.New("invalid length")
+	}
+	s.c = Currency(b[0])
+	s.v = int64(binary.LittleEndian.Uint64(b[1:9]))
+	return nil
+}
