@@ -77,6 +77,36 @@ func ExampleAmount_equality() {
 	// Output: true
 }
 
+func ExampleAmount_MulFraction() {
+	x := fpmoney.FromInt(3, fpmoney.SGD)
+	fmt.Println(x.MulFraction(1.5))
+	// Output: 4.5 SGD
+}
+
+func ExampleAmount_MulFraction_zero() {
+	x := fpmoney.FromInt(3, fpmoney.SGD)
+	fmt.Println(x.MulFraction(0))
+	// Output: 0 SGD
+}
+
+func ExampleAmount_MulFraction_identity() {
+	x := fpmoney.FromInt(3, fpmoney.SGD)
+	fmt.Println(x.MulFraction(1))
+	// Output: 3 SGD
+}
+
+func ExampleAmount_MulFraction_negate() {
+	x := fpmoney.FromInt(3, fpmoney.SGD)
+	fmt.Println(x.MulFraction(-1))
+	// Output: -3 SGD
+}
+
+func ExampleAmount_MulFraction_whole() {
+	x := fpmoney.FromInt(2, fpmoney.SGD)
+	fmt.Println(x.MulFraction(2))
+	// Output: 4 SGD
+}
+
 func ExampleAmount_equality_same_currency() {
 	x := fpmoney.FromInt(10, fpmoney.SGD)
 	y := fpmoney.FromInt(10, fpmoney.SGD)
@@ -402,13 +432,13 @@ func TestUnmarshalJSON(t *testing.T) {
 		// 2 cents strange valid input
 		{
 			s: `    {   "amount" : 9002.01
-            
-            , 
-            
+
+            ,
+
             "currency"
-                : 
-            
-            "SGD"}   
+                :
+
+            "SGD"}
 
 
              `,

@@ -92,6 +92,23 @@ func (a Amount) DivMod(b int) (part Amount, remainder Amount) {
 	return Amount{v: a.v / int64(b), c: a.c}, Amount{v: a.v % int64(b), c: a.c}
 }
 
+// MulFraction multiplies by non-integer amount.
+func (a Amount) MulFraction(b float64) Amount {
+	if b == 0 {
+		return Amount{v: 0, c: a.c}
+	}
+	if b == 1 {
+		return a
+	}
+	if b == -1 {
+		return Amount{v: -a.v, c: a.c}
+	}
+	if float64(int(b)) == b {
+		return a.Mul(int(b))
+	}
+	return FromFloat(a.Float64()*b, a.c)
+}
+
 // Convert with rate=to/from
 func (a Amount) Convert(to Currency, rate float64) Amount {
 	if a.Currency() == to {
