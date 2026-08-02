@@ -9,75 +9,64 @@ import (
 
 var ErrWrongCurrencyString = errors.New("wrong currency string")
 
-type ErrCurrencyMismatch struct {
-	A, B Currency
-}
-
-func NewErrCurrencyMismatch() *ErrCurrencyMismatch { return &ErrCurrencyMismatch{} }
+type ErrCurrencyMismatch struct{ A, B Currency }
 
 func (e *ErrCurrencyMismatch) Error() string { return e.A.String() + " != " + e.B.String() }
 
 // Amount stores fixed-precision decimal money.
-// Stores integer number of cents for ISO 4217 currency.
 // Values fit in ~92 quadrillion for 2 decimal currencies.
 // Does not use float in printing nor parsing.
 // Rounds down fractional cents during parsing.
-// Blocking arithmetic operations that result in loss of precision.
+// Blocks arithmetics that result in loss of precision or mismatched currency.
 type Amount struct {
-	v int64
-	c Currency
-	_ uint8  // padding for improved line alignment, 2x improves arithmetics
-	_ uint32 // padding
+	Minor    int64
+	Currency Currency
 }
 
-func FromIntScaled[T ~int | ~int8 | ~int16 | ~int32 | ~int64](v T, currency Currency) Amount {
-	return Amount{v: int64(v), c: currency}
+func FromMinor[T ~int | ~int8 | ~int16 | ~int32 | ~int64](v T, currency Currency) Amount {
+	return Amount{Minor: int64(v), Currency: currency}
 }
 
 func FromInt[T ~int | ~int8 | ~int16 | ~int32 | ~int64](v T, currency Currency) Amount {
-	return Amount{v: int64(v) * int64(currency.scale()), c: currency}
+	return Amount{Minor: int64(v) * int64(currency.scale()), Currency: currency}
 }
 
 func FromFloat[T ~float32 | ~float64](v T, currency Currency) Amount {
-	return Amount{v: int64(T(v) * T(currency.scale())), c: currency}
+	return Amount{Minor: int64(T(v) * T(currency.scale())), Currency: currency}
 }
 
-func (a Amount) Float32() float32 { return float32(a.v) / float32(a.c.scale()) }
+func (a Amount) Float32() float32 { return float32(a.Minor) / float32(a.Currency.scale()) }
 
-func (a Amount) Float64() float64 { return float64(a.v) / float64(a.c.scale()) }
-
-func (a Amount) Currency() Currency { return a.c }
-
-func (a Amount) Scaled() int64 { return a.v }
+func (a Amount) Float64() float64 { return float64(a.Minor) / float64(a.Currency.scale()) }
 
 func (a Amount) Add(b Amount) Amount {
-	checkCurrency(a.c, b.c)
-	return Amount{v: a.v + b.v, c: a.c}
+	checkCurrency(a.Currency, b.Currency)
+	return Amount{Minor: a.Minor + b.Minor, Currency: a.Currency}
 }
 
 func (a Amount) Sub(b Amount) Amount {
-	checkCurrency(a.c, b.c)
-	return Amount{v: a.v - b.v, c: a.c}
+	checkCurrency(a.Currency, b.Currency)
+	return Amount{Minor: a.Minor - b.Minor, Currency: a.Currency}
 }
 
 func (a Amount) GreaterThan(b Amount) bool {
-	checkCurrency(a.c, b.c)
-	return a.v > b.v
+	checkCurrency(a.Currency, b.Currency)
+	return a.Minor > b.Minor
 }
 
 func (a Amount) LessThan(b Amount) bool {
-	checkCurrency(a.c, b.c)
-	return a.v < b.v
+	checkCurrency(a.Currency, b.Currency)
+	return a.Minor < b.Minor
 }
 
 func (a Amount) GreaterThanOrEqual(b Amount) bool {
-	checkCurrency(a.c, b.c)
-	return a.v >= b.v
+	checkCurrency(a.Currency, b.Currency)
+	return a.Minor >= b.Minor
 }
 
 func (a Amount) LessThanOrEqual(b Amount) bool {
-	checkCurrency(a.c, b.c)
-	return a.v <= b.v
+	checkCurrency(a.Currency, b.Currency)
+	return a.Minor <= b.Minor
 }
 
 func checkCurrency(a, b Currency) {
@@ -86,43 +75,44 @@ func checkCurrency(a, b Currency) {
 	}
 }
 
-func (a Amount) Mul(b int) Amount { return Amount{v: a.v * int64(b), c: a.c} }
+func (a Amount) Mul(b int) Amount { return Amount{Minor: a.Minor * int64(b), Currency: a.Currency} }
 
 func (a Amount) DivMod(b int) (part Amount, remainder Amount) {
-	return Amount{v: a.v / int64(b), c: a.c}, Amount{v: a.v % int64(b), c: a.c}
+	return Amount{Minor: a.Minor / int64(b), Currency: a.Currency}, Amount{Minor: a.Minor % int64(b), Currency: a.Currency}
 }
 
-// MulFraction multiplies by non-integer amount.
 func (a Amount) MulFraction(b float64) Amount {
 	if b == 0 {
-		return Amount{v: 0, c: a.c}
+		return Amount{Minor: 0, Currency: a.Currency}
 	}
 	if b == 1 {
 		return a
 	}
 	if b == -1 {
-		return Amount{v: -a.v, c: a.c}
+		return Amount{Minor: -a.Minor, Currency: a.Currency}
 	}
 	if float64(int(b)) == b {
 		return a.Mul(int(b))
 	}
-	return FromFloat(a.Float64()*b, a.c)
+	// skip scale roundtrip
+	return Amount{Minor: int64(float64(a.Minor) * b), Currency: a.Currency}
 }
 
 // Convert with rate=to/from
 func (a Amount) Convert(to Currency, rate float64) Amount {
-	if a.Currency() == to {
+	if a.Currency == to {
 		return a
 	}
-	return FromFloat(a.Float64()*rate, to)
+	// skip scale roundtrip
+	return Amount{Minor: int64(float64(a.Minor) * rate), Currency: to}
 }
 
 func (a Amount) StringPair() (amount, currency string) {
-	return fpdecimal.FixedPointDecimalToString(a.v, a.c.Exponent()), a.c.String()
+	return fpdecimal.FixedPointDecimalToString(a.Minor, a.Currency.Exponent()), a.Currency.String()
 }
 
 func (a Amount) String() string {
-	return fpdecimal.FixedPointDecimalToString(a.v, a.c.Exponent()) + " " + a.c.String()
+	return fpdecimal.FixedPointDecimalToString(a.Minor, a.Currency.Exponent()) + " " + a.Currency.String()
 }
 
 const (
@@ -131,14 +121,14 @@ const (
 	lenISO427Currency = 3
 )
 
-// UnmarshalJSON parses string.
-// This is implemented directly for speed.
-// Avoiding json.Decoder, interface{}, reflect, tags, temporary structs.
-// Avoiding mallocs.
-// Go json package provides:
-// - check that pointer method receiver is not nil;
-// - removes whitespace in b []bytes
 func (a *Amount) UnmarshalJSON(b []byte) (err error) {
+	// This is implemented directly for speed.
+	// Avoiding json.Decoder, interface{}, reflect, tags, temporary structs.
+	// Avoiding mallocs.
+	//
+	// Go json package provides:
+	// - check that pointer method receiver is not nil;
+	// - removes whitespace in b []bytes
 	var as, ae, e int
 
 	for i := 0; i < len(b); i++ {
@@ -158,7 +148,7 @@ func (a *Amount) UnmarshalJSON(b []byte) (err error) {
 				return ErrWrongCurrencyString
 			}
 
-			if err := a.c.UnmarshalText(b[i:e]); err != nil {
+			if err := a.Currency.UnmarshalText(b[i:e]); err != nil {
 				return err
 			}
 			i = e
@@ -178,7 +168,7 @@ func (a *Amount) UnmarshalJSON(b []byte) (err error) {
 		}
 	}
 
-	a.v, err = fpdecimal.ParseFixedPointDecimal(b[as:ae], a.c.Exponent())
+	a.Minor, err = fpdecimal.ParseFixedPointDecimal(b[as:ae], a.Currency.Exponent())
 
 	return err
 }
@@ -188,14 +178,14 @@ func (a Amount) AppendJSON(b []byte) ([]byte, error) {
 	b = append(b, keyAmount...)
 	b = append(b, `":`...)
 
-	b = fpdecimal.AppendFixedPointDecimal(b, a.v, a.c.Exponent())
+	b = fpdecimal.AppendFixedPointDecimal(b, a.Minor, a.Currency.Exponent())
 
 	b = append(b, `,"`...)
 	b = append(b, keyCurrency...)
 	b = append(b, `":"`...)
 
 	var err error
-	b, err = a.c.AppendText(b)
+	b, err = a.Currency.AppendText(b)
 
 	b = append(b, `"}`...)
 	return b, err
@@ -206,8 +196,8 @@ func (a Amount) MarshalJSON() ([]byte, error) { return a.AppendJSON(make([]byte,
 const NumBytes = 8 + 1
 
 func (s Amount) AppendBinary(b []byte) ([]byte, error) {
-	b = append(b, byte(s.c))
-	b = binary.LittleEndian.AppendUint64(b, uint64(s.v))
+	b = append(b, byte(s.Currency))
+	b = binary.LittleEndian.AppendUint64(b, uint64(s.Minor))
 	return b, nil
 }
 
@@ -217,7 +207,7 @@ func (s *Amount) UnmarshalBinary(b []byte) error {
 	if len(b) != NumBytes {
 		return errors.New("invalid length")
 	}
-	s.c = Currency(b[0])
-	s.v = int64(binary.LittleEndian.Uint64(b[1:9]))
+	s.Currency = Currency(b[0])
+	s.Minor = int64(binary.LittleEndian.Uint64(b[1:9]))
 	return nil
 }
