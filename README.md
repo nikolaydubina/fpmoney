@@ -2,10 +2,6 @@
   <img width="300" height="300" src="https://github.com/nikolaydubina/fpmoney/assets/2933061/022c83e3-8a14-4e8f-b1b7-94ab262fa590">
 </p>
 
-<p align="center">
-  ✨ Sponsored by <a href="https://ndx.one/?ct=github">NDX Technologies</a>
-</p>
-
 ## 🧧 Fixed-Point Decimal Money
 
 [![codecov](https://codecov.io/gh/nikolaydubina/fpmoney/branch/master/graph/badge.svg?token=Eh52jhLERp)](https://codecov.io/gh/nikolaydubina/fpmoney)
