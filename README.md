@@ -1,15 +1,9 @@
-<p align="center">
-  <img width="300" height="300" src="https://github.com/nikolaydubina/fpmoney/assets/2933061/022c83e3-8a14-4e8f-b1b7-94ab262fa590">
-</p>
-
-## 🧧 Fixed-Point Decimal Money
+## Fixed-Point Decimal Money
 
 [![codecov](https://codecov.io/gh/nikolaydubina/fpmoney/branch/master/graph/badge.svg?token=Eh52jhLERp)](https://codecov.io/gh/nikolaydubina/fpmoney)
 [![Go Reference](https://pkg.go.dev/badge/github.com/nikolaydubina/fpmoney.svg)](https://pkg.go.dev/github.com/nikolaydubina/fpmoney)
 [![Mentioned in Awesome Go](https://awesome.re/mentioned-badge.svg)](https://github.com/avelino/awesome-go)
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/nikolaydubina/fpmoney/badge)](https://securityscorecards.dev/viewer/?uri=github.com/nikolaydubina/fpmoney)
-
-> _**Be Precise:** using floats to represent currency is almost criminal. — Robert.C.Martin, "Clean Code" p.301_
 
 * as fast as `int64`
 * no `float` in parsing nor printing, does not leak precision
