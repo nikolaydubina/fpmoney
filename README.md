@@ -69,11 +69,9 @@ ok      github.com/nikolaydubina/fpmoney        15.804s
 
 ## References and Related Work
 
-- [ferdypruis/iso4217](https://github.com/ferdypruis/iso4217) was a good inspiration and reference material. it was used in early version as well. it is well maintained and fast library for currencies. 
-- `github.com/shopspring/decimal`: fixed precision; faster printing/parsing/arithmetics; currency handling 
-- `github.com/Rhymond/go-money`: does not use `float` or `interface{}` in parsing; currency is enum
-- `github.com/ferdypruis/iso4217`: skipped deprecated currencies to fit into `uint8` and smaller struct size
-- https://en.wikipedia.org/wiki/ISO_4217
+- `github.com/shopspring/decimal`: arbitrary decimal precision, slower printing/parsing/arithmetics
+- `github.com/Rhymond/go-money`: uses `float`, `interface{}` in parsing; currency is string
+- https://github.com/ferdypruis/iso4217
 
 [^1]: excluding currencies with 4+ minor units `CLF`, `UYW`
 [^2]: excluding deprecated currencies `HRD`, `HRK`, `SLL`, `ZWL`
