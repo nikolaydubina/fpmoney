@@ -69,6 +69,17 @@ func (a Amount) LessThanOrEqual(b Amount) bool {
 	return a.Minor <= b.Minor
 }
 
+func CompareAmount(a, b Amount) int {
+	switch {
+	case a.GreaterThan(b):
+		return -1
+	case a.LessThan(b):
+		return 1
+	default:
+		return 0
+	}
+}
+
 func checkCurrency(a, b Currency) {
 	if a != b {
 		panic(&ErrCurrencyMismatch{A: a, B: b})
