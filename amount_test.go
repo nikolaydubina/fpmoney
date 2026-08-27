@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
+	"slices"
 	"strconv"
 	"strings"
 	"testing"
@@ -163,6 +164,20 @@ func ExampleAmount_Minor_from_Minor() {
 	v := fpmoney.FromMinor(17, fpmoney.EUR)
 	fmt.Println(v.Minor)
 	// Output: 17
+}
+
+func ExampleCompareAmount() {
+	amounts := []fpmoney.Amount{
+		fpmoney.FromInt(70, fpmoney.USD),
+		fpmoney.FromInt(4, fpmoney.USD),
+		fpmoney.FromInt(1, fpmoney.USD),
+		fpmoney.FromInt(16, fpmoney.USD),
+	}
+
+	slices.SortFunc(amounts, fpmoney.CompareAmount)
+
+	fmt.Println(amounts)
+	// Output: [1 USD 4 USD 16 USD 70 USD]
 }
 
 func FuzzArithmetics(f *testing.F) {

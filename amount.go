@@ -71,10 +71,10 @@ func (a Amount) LessThanOrEqual(b Amount) bool {
 
 func CompareAmount(a, b Amount) int {
 	switch {
-	case a.GreaterThan(b):
-		return -1
 	case a.LessThan(b):
-		return 1
+		return -1
+	case a.GreaterThan(b):
+		return +1
 	default:
 		return 0
 	}
