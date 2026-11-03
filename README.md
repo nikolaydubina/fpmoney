@@ -1,9 +1,5 @@
 ## Fixed-Point Decimal Money
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/nikolaydubina/fpmoney.svg)](https://pkg.go.dev/github.com/nikolaydubina/fpmoney)
-[![Mentioned in Awesome Go](https://awesome.re/mentioned-badge.svg)](https://github.com/avelino/awesome-go)
-[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/nikolaydubina/fpmoney/badge)](https://securityscorecards.dev/viewer/?uri=github.com/nikolaydubina/fpmoney)
-
 * as fast as `int64`
 * no `float` in parsing nor printing, does not leak precision
 * `ISO 4217`[^1][^2] currency
